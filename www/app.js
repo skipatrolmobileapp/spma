@@ -2,13 +2,13 @@
 /*jshint unused: false */
 /*jslint node: true */
 /*jslint indent: 4 */
-/*jslint unparam:true*/
-/*global console, setTimeout, device, onDeviceReady, window, navigator, localStorage, document, Date, ons, module, angular, spinnerModal, moment */
+/*jslint unparam:true */
+/*global console, setTimeout, device, onDeviceReady, window, navigator, localStorage, document, Date, ons, module, angular, spinnerModal, moment, settingLoggingAppId */
 "use strict";
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2015, Gary Meyer.
+Copyright © 2014-2018, Gary Meyer.
 All rights reserved.
 */
 
@@ -16,11 +16,11 @@ All rights reserved.
 Some globals. Not too many though.
 */
 var IN_CORDOVA = false, // Indicator if in Cordova. Assume not.
-    havingPatience = false, // Indicates whether or not the user is waiting and watching the spinner.
-    DSP_BASE_URL = 'https://api-skipatrol.rhcloud.com:443', // Base URL of the DreamFactory Service Platform (DSP) instance.
-    DSP_HOST = 'api-skipatrol.rhcloud.com', // Host name of the DreamFactory Service Platform (DSP) instance.
+    DSP_HOST = 'api.medic52team.com', // Host name of the DreamFactory Service Platform (DSP) instance.
     DSP_PORT = '443', // Port of the DreamFactory Service Platform (DSP) instance.
-    DSP_APP_NAME = 'skipatrolmobileapp', // Suffix for appending after the the DSP API request indicating the application name.
+    DSP_BASE_URL = 'https://' + DSP_HOST + ':' + DSP_PORT, // Base URL of the DreamFactory Service Platform (DSP) instance.
+    DSP_API_KEY = '510cb035f3ac4548fb4e75c94f40d616a67c8288faea9cd383ee219b413afdb0', // DSP 2.x app identifier.
+    havingPatience = false, // Indicates whether or not the user is waiting and watching the spinner.
     requestMap = {}; // A map of requests for knowing when the data was last requested so that periodic cache refreshes can be done.
 
 /*
@@ -28,6 +28,7 @@ Let iOS status bar fully appear.
 TODO: Perhaps there's a way to get the ons-toolbar to display smartly on the iPhone.
 */
 ons.disableAutoStatusBarFill();
+
 
 /*
 Initialize Cordova.
@@ -39,10 +40,12 @@ Mind the gap, that is the PhoneGap. Or Cordova if you'd prefer.
 */
 function onDeviceReady() {
     IN_CORDOVA = true;
+    StatusBar.hide();
 }
 
 /*
-Initialize Onsen UI and ngTouch.
+Initialize Onsen UI and ngTouch. Onsen UI is the UI library, Angular the primary JavaScript
+framework, and the Angular touch plug-in for support of gestures, such as swipe.
 */
 var module = ons.bootstrap('myApp', ['onsen', 'ngTouch']);
 
@@ -51,18 +54,18 @@ angular.module('myApp')
     return {
       restrict: 'A',
       link: function postLink(scope, element, attrs) {
-        if (attrs.myFocus == "") {
-          attrs.myFocus = "focusElement";
+        if ('' === attrs.myFocus) {
+          attrs.myFocus = 'focusElement';
         }
         scope.$watch(attrs.myFocus, function(value) {
           if(value == attrs.id) {
             element[0].focus();
           }
         });
-        element.on("blur", function() {
-          scope[attrs.myFocus] = "";
+        element.on('blur', function() {
+          scope[attrs.myFocus] = '';
           scope.$apply();
-        })        
+        });
       }
     };
   });
@@ -161,8 +164,48 @@ function browserLogData(level, data, $log) {
 }
 
 /*
+Create a DSP request, cached by default with refreshes every 10 minutes for GETs.
+TODO: Will be changing when upgrading to DSP 2.0.
+*/
+function dspRequest(httpMethod, urlPathAndParms, dataContent, refreshSeconds) {
+    var email = localStorage.getItem('DspEmail'),
+        password = localStorage.getItem('DspPassword'),
+        aRequest = {
+            'method': httpMethod,
+            'cache': true,
+            'timeout': 8000,
+            'url': DSP_BASE_URL + '/api/v2' + urlPathAndParms,
+            'headers': {
+                'X-DreamFactory-API-Key': DSP_API_KEY
+            },
+            'data': dataContent
+        },
+        now = moment();
+    if (email && password) {
+        aRequest.headers.Authorization = 'Basic ' + btoa(email + ':' + password);
+    }
+    if ('GET' === httpMethod) {
+        if (!requestMap[urlPathAndParms]) {
+            aRequest.cache = false;
+            requestMap[urlPathAndParms] = moment();
+        } else {
+            if (!refreshSeconds) {
+                refreshSeconds = 600;
+            }
+            if (requestMap[urlPathAndParms].add(refreshSeconds, 'seconds') < now) {
+                aRequest.cache = false;
+                requestMap[urlPathAndParms] = moment();
+            }
+        }
+    } else {
+        aRequest.cache = false;
+    }
+    return aRequest;
+}
+
+/*
 Send a log event to the server.
-Note the SPMA 'app' attribute.
+Note the 'app' attribute global set in the index.html to specify the app and its version.
 */
 function serverLog(level, event, data, $http) {
     var accessLogData = {
@@ -174,6 +217,9 @@ function serverLog(level, event, data, $http) {
             'event': event,
             'level': level,
             'json': angular.toJson(data)
+        },
+        postResource = {
+            "resource": []
         };
     if (-1 === document.URL.indexOf('http://') && -1 === document.URL.indexOf('https://')) {
         if (IN_CORDOVA) {
@@ -182,7 +228,8 @@ function serverLog(level, event, data, $http) {
             accessLogData.device = 'Native/unknown';
         }
     }
-    $http(dspRequest('POST', '/db/AccessLog', accessLogData)).
+    postResource.resource.push(accessLogData);
+    $http(dspRequest('POST', '/logging/_table/AccessLog', postResource)).
         success(function (data, status, headers, config) {
             return;
         }).
@@ -214,27 +261,6 @@ function win(r) {
 function fail(error) {
     // alert("An error has occurred: Code = " + error.code);
 }
-
-/*
-File upload service.
-From: https://github.com/dreamfactorysoftware/dsp-core/wiki/File-Storage-Services
-*/
-module.service('PostPhoto', ['$http', function ($http) {
-    this.upload = function (filename, imageUri) {
-        var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
-            email = localStorage.getItem('DspEmail'),
-            password = localStorage.getItem('DspPassword'),
-            url = 'https://' + DSP_HOST + ':' + DSP_PORT + '/rest/files/posts/' + patrolPrefix + '/' + filename + '?app_name=' + DSP_APP_NAME,
-            options = new FileUploadOptions(),
-            ft = new FileTransfer();
-        options.fileKey = "files";
-        options.fileName = filename;
-        options.mimeType = "image/jpeg";
-        options.chunkedMode = false;
-        ft.upload(imageUri, url, win, fail, options);
-        
-    };
-}]);
 
 /*
 Text somebody's phone number.
@@ -372,49 +398,88 @@ Make a nice and pretty message.
 */
 function niceMessage(data, status) {
     var message = 'Server error';
-    if ((data) && (data.error) && (data.error[0]) && (data.error[0].message)) {
-        message = data.error[0].message;
-    } else if (status) {
-        message = 'Status: ' + status;
+    if (data) {
+        if ((data.error) && (data.error) && (data.error.message)) {
+            message = data.error.message;
+        } else if (status) {
+            switch (status) {
+            case 400:
+                message = 'Bad request.';
+                break;
+            case 401:
+                message = 'Login failed.';
+                break;
+            case 404:
+                message = 'Service not found.';
+                break;
+            case 500:
+                message = 'Server is not available Try again later.';
+                break;
+            default:
+                message = 'Status: ' + status;
+            }
+        } else {
+            message = JSON.stringify(data);        
+        }
     }
     return message;
 }
 
 /*
-Create a DSP request, cached by default with refreshes every 10 minutes for GETs.
+Convert string to Title Case.
+See: http://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript
 */
-function dspRequest(httpMethod, urlPathAndParms, dataContent, refreshSeconds) {
-    var email = localStorage.getItem('DspEmail'),
-        password = localStorage.getItem('DspPassword'),
-        aRequest = {
-            'method': httpMethod,
-            'cache': true,
-            'timeout': 8000,
-            'url': DSP_BASE_URL + '/rest' + urlPathAndParms,
-            'headers': {
-                'X-DreamFactory-Application-Name': DSP_APP_NAME,
-            },
-            'data': dataContent
-        },
-        now = moment();
-    if (email && password) {
-        aRequest.headers.Authorization = 'Basic ' + btoa(email + ':' + password);
-    }
-    if ('GET' === httpMethod) {
-        if (!requestMap[urlPathAndParms]) {
-            aRequest.cache = false;
-            requestMap[urlPathAndParms] = moment();
-        } else {
-            if (!refreshSeconds) {
-                refreshSeconds = 600;
-            }
-            if (requestMap[urlPathAndParms].add(refreshSeconds, 'seconds') < now) {
-                aRequest.cache = false;
-                requestMap[urlPathAndParms] = moment();
-            }
-        }
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+/*
+Convert degrees bearing to such as "SW".
+*/
+function writeOutBearing(bearing) {
+    var retValue;
+    if (bearing < 11.25) {
+        retValue = 'north';
+    } else if (bearing < 33.75) {
+        retValue = 'north-northeast';
+    } else if (bearing < 56.25) {
+        retValue = 'northeast';
+    } else if (bearing < 78.75) {
+        retValue = 'east-northeast';
+    } else if (bearing < 101.25) {
+        retValue = 'east';
+    } else if (bearing < 123.75) {
+        retValue = 'east-southeast';
+    } else if (bearing < 146.25) {
+        retValue = 'southeast';
+    } else if (bearing < 168.75) {
+        retValue = 'south-southeast';
+    } else if (bearing < 191.25) {
+        retValue = 'south';
+    } else if (bearing < 213.75) {
+        retValue = 'south-southwest';
+    } else if (bearing < 236.25) {
+        retValue = 'southwest';
+    } else if (bearing < 258.75) {
+        retValue = 'west-southwest';
+    } else if (bearing < 281.25) {
+        retValue = 'west';
+    } else if (bearing < 303.75) {
+        retValue = 'west-northwest';
+    } else if (bearing < 326.25) {
+        retValue = 'northwest';
+    } else if (bearing < 348.75) {
+        retValue = 'north-northwest';
     } else {
-        aRequest.cache = false;
+        retValue = 'north';
     }
-    return aRequest;
+    return retValue;
+}
+
+/*
+Format number with commas.
+From: http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+*/
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

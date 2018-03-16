@@ -2,66 +2,17 @@
 /*jshint unused: false */
 /*jslint node: true */
 /*jslint indent: 4 */
-/*jslint unparam:true*/
-/*global window, document, navigator, alert, localStorage, ons, angular, module, dspRequest, AccessLogService, logisticsNavigator, dial, browse, moment, LatLon, Math */
+/*jslint unparam:true */
+/*global window, document, navigator, localStorage, ons, angular, module, moment, Math, LatLon, google, dspRequest, logisticsNavigator, dial, browse, niceMessage, openAd, havePatience, waitNoMore, numberWithCommas, writeOutBearing */
 "use strict";
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2015, Gary Meyer.
+Copyright © 2014-2018, Gary Meyer.
 All rights reserved.
 */
 
-/*
-Convert degrees bearing to such as "SW".
-*/
-function writeOutBearing(bearing) {
-    var retValue;
-    if (bearing < 11.25) {
-        retValue = 'north';
-    } else if (bearing < 33.75) {
-        retValue = 'north-northeast';
-    } else if (bearing < 56.25) {
-        retValue = 'northeast';
-    } else if (bearing < 78.75) {
-        retValue = 'east-northeast';
-    } else if (bearing < 101.25) {
-        retValue = 'east';
-    } else if (bearing < 123.75) {
-        retValue = 'east-southeast';
-    } else if (bearing < 146.25) {
-        retValue = 'southeast';
-    } else if (bearing < 168.75) {
-        retValue = 'south-southeast';
-    } else if (bearing < 191.25) {
-        retValue = 'south';
-    } else if (bearing < 213.75) {
-        retValue = 'south-southwest';
-    } else if (bearing < 236.25) {
-        retValue = 'southwest';
-    } else if (bearing < 258.75) {
-        retValue = 'west-southwest';
-    } else if (bearing < 281.25) {
-        retValue = 'west';
-    } else if (bearing < 303.75) {
-        retValue = 'west-northwest';
-    } else if (bearing < 326.25) {
-        retValue = 'northwest';
-    } else if (bearing < 348.75) {
-        retValue = 'north-northwest';
-    } else {
-        retValue = 'north';
-    }
-    return retValue;
-}
-
-/*
-Format number with commas.
-From: http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
-*/
-function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+var sampling = false;
 
 /*
 A helper to hide territory menu items if there's nothing there.
@@ -87,16 +38,14 @@ function hideMenuFor(label) {
 Logistics.
 */
 module.controller('LogisticsController', function ($rootScope, $scope, $http, AccessLogService) {
-    var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
-        patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
         role = localStorage.getItem('DspRole'),
         ads = angular.fromJson(localStorage.getItem('DspAd')),
         maps = angular.fromJson(localStorage.getItem('DspMap')),
-        mapRequest = dspRequest('GET', '/db/Map?order=name', null),
+        mapRequest = dspRequest('GET', '/team/_table/Map?order=name', null),
         territories = angular.fromJson(localStorage.getItem('DspTerritory')),
         nicknames = angular.fromJson(localStorage.getItem('DspNickname')),
-        nicknameRequest = dspRequest('GET', '/db/Nickname?order=territory,name', null),
-        element,
+        nicknameRequest = dspRequest('GET', '/team/_table/Nickname?order=territory,name', null),
         i;
     AccessLogService.log('info', 'Logistics');
     $scope.enableAd = false;
@@ -133,23 +82,28 @@ module.controller('LogisticsController', function ($rootScope, $scope, $http, Ac
     } else {
         $scope.showMaps = false;
     }
+    if (patrol.territoryLabel) {
+        $scope.territoryLabel = patrol.territoryLabel;
+    } else {
+        $scope.territoryLabel = 'Areas';
+    }
     $scope.territories = territories;
     $http(mapRequest).
         success(function (data, status, headers, config) {
-            $scope.maps = data.record;
-            if ((data.record) && data.record.length > 0) {
+            $scope.maps = data.resource;
+            if ((data.resource) && data.resource.length > 0) {
                 $scope.showMaps = true;
             } else {
                 $scope.showMaps = false;
             }
-            localStorage.setItem('DspMap', angular.toJson(data.record));
+            localStorage.setItem('DspMap', angular.toJson(data.resource));
         }).
         error(function (data, status, headers, config) {
             AccessLogService.log('error', 'GetMapErr', niceMessage(data, status));
         });
     $http(nicknameRequest).
         success(function (data, status, headers, config) {
-            localStorage.setItem('DspNickname', angular.toJson(data.record));
+            localStorage.setItem('DspNickname', angular.toJson(data.resource));
             $scope.hideNicknames = hideMenuFor('DspNickname');
         }).
         error(function (data, status, headers, config) {
@@ -174,8 +128,6 @@ module.controller('LogisticsController', function ($rootScope, $scope, $http, Ac
         return;
     });
 });
-
-var sampling = false;
 
 /*
 Mark location.
@@ -265,7 +217,7 @@ module.controller('MarkController', function ($rootScope, $scope, $http, AccessL
         AccessLogService.log('info', 'Geolocation', 'Not available');
     }
     $scope.mark = function() {
-        var body = {
+        var body = { resource: [{
                 "tenantId": patrolPrefix,
                 "userId": localStorage.getItem('DspUserId'),
                 "userName": localStorage.getItem('DspName'),
@@ -278,8 +230,8 @@ module.controller('MarkController', function ($rootScope, $scope, $http, AccessL
                 "altitudeAccuracy": $scope.altitudeAccuracy,
                 "heading": $scope.heading,
                 "speed": $scope.speed
-            },
-            geoMarkRequest = dspRequest('POST', '/db/GeoMark', body);
+            }]},
+            geoMarkRequest = dspRequest('POST', '/team/_table/GeoMark', body);
         havePatience($rootScope);
         $http(geoMarkRequest).
             success(function (data, status, headers, config) {
@@ -307,13 +259,13 @@ Marked geolocations.
 */
 module.controller('MarkedController', function ($rootScope, $scope, $http, AccessLogService) {
     var aDayAgo = moment().subtract(1, 'days').format('YYYY-MM-DD HH:mm:ss'),
-        geoMarkRequest = dspRequest('GET', '/db/GeoMark?filter=scannedOn%3E%22' + aDayAgo + '%22&order=scannedOn%20desc', null);
+        geoMarkRequest = dspRequest('GET', '/team/_table/GeoMark?filter=scannedOn%3E%22' + aDayAgo + '%22&order=scannedOn%20desc', null);
     AccessLogService.log('info', 'Marked');
     havePatience($rootScope);
     $http(geoMarkRequest).
         success(function (data, status, headers, config) {
-            $scope.geoMarks = data.record;
-            if ((data.record) && (0 === data.record.length)) {
+            $scope.geoMarks = data.resource;
+            if ((data.resource) && (0 === data.resource.length)) {
                 $scope.message = 'This feature can be used to mark the latitude and longitude of a spot on the mountain, such as for marking a location in the trees or out-of-bounds for follow-on patrollers to more quickly find.';
             }
             waitNoMore();
@@ -339,7 +291,8 @@ module.controller('MarkedController', function ($rootScope, $scope, $http, Acces
 Find a marked geolocations.
 */
 module.controller('FindController', function ($rootScope, $scope, $http, AccessLogService) {
-    var geoMark = angular.fromJson(localStorage.getItem('OnsGeoMark')),
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        geoMark = angular.fromJson(localStorage.getItem('OnsGeoMark')),
         pos = {
             lat: geoMark.latitude,
             lng: geoMark.longitude
@@ -387,10 +340,18 @@ module.controller('FindController', function ($rootScope, $scope, $http, AccessL
                         elevation,
                         tip,
                         bounds = new google.maps.LatLngBounds();
-                    if (meters > 500) {
-                        directions = numberWithCommas(Math.round(10 * meters / 1609.34) / 10) + ' miles';
+                    if ('USA' === patrol.country) {
+                        if (meters > 500) {
+                            directions = numberWithCommas(Math.round(10 * meters / 1609.34) / 10) + ' miles';
+                        } else {
+                            directions = numberWithCommas(Math.round(meters * 1.09361)) + ' yards';
+                        }
                     } else {
-                        directions = numberWithCommas(Math.round(meters * 1.09361)) + ' yards';
+                        if (meters > 1000) {
+                            directions = numberWithCommas(Math.round(meters / 1000)) + ' km';
+                        } else {
+                            directions = numberWithCommas(Math.round(meters)) + ' m';
+                        }
                     }
                     directions = directions + ' ' + writeOutBearing(bearing);
                     $http(googleElevationRequest).
@@ -401,9 +362,17 @@ module.controller('FindController', function ($rootScope, $scope, $http, AccessL
                             }
                             if (geoMark.elevation && elevation) {
                                 if (geoMark.elevation > elevation) {
-                                    tip = Math.round(3.28084 * (geoMark.elevation - elevation)) + ' ft above you';
+                                    if ('USA' === patrol.country) {
+                                        tip = Math.round(3.28084 * (geoMark.elevation - elevation)) + ' ft above you';
+                                    } else {
+                                        tip = Math.round(geoMark.elevation - elevation) + ' m above you';
+                                    }
                                 } else {
-                                    tip = Math.round(3.28084 * (elevation - geoMark.elevation)) + ' ft below you';
+                                    if ('USA' === patrol.country) {
+                                        tip = Math.round(3.28084 * (elevation - geoMark.elevation)) + ' ft below you';
+                                    } else {
+                                        tip = Math.round(elevation - geoMark.elevation) + ' m below you';
+                                    }
                                 }
                                 $scope.message = directions + ', ' + tip;
                             } else {
@@ -464,16 +433,17 @@ TODO: Make this queue based for QR codes out of data connection range.
 function postQrCodeScan($http, $scope, AccessLogService, nickname, longitude, latitude) {
     var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
         userId = localStorage.getItem('DspUserId'),
-        body = {
+        body = { resource: [{
             id: null,
+            tenantId: patrolPrefix,
             location: nickname,
             userId: userId,
             scannedBy: localStorage.getItem('DspName'),
             scannedOn: moment().format('YYYY-MM-DD HH:mm:ss') + ' UTC',
             longitude: longitude,
             latitude: latitude
-        },
-        qrCodeScanPostRequest = dspRequest('POST', '/db/QrCodeScan', body);
+        }]},
+        qrCodeScanPostRequest = dspRequest('POST', '/team/_table/QrCodeScan', body);
     $http(qrCodeScanPostRequest).
         success(function (data, status, headers, config) {
             $scope.scanned = nickname;
@@ -489,11 +459,10 @@ function postQrCodeScan($http, $scope, AccessLogService, nickname, longitude, la
 Get and populate QR code scans.
 */
 function fillInQrCodeScans($http, $scope, AccessLogService) {
-    var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
-        i = 0,
+    var i = 0,
         userId = localStorage.getItem('DspUserId'),
         qrCodeScans = angular.fromJson(localStorage.getItem('DspQrCodeScan')),
-        qrCodeScanRequest = dspRequest('GET', '/db/QrCodeScan?filter=userId%3D' + userId + '&order=scannedOn%20desc', null);
+        qrCodeScanRequest = dspRequest('GET', '/team/_table/QrCodeScan?filter=userId%3D' + userId + '&order=scannedOn%20desc', null);
     if (qrCodeScans) {
         for (i = 0; i < qrCodeScans.length; i += 1) {
             qrCodeScans[i].scanned = moment(qrCodeScans[i].scannedOn).format('MMM D HH:mm');
@@ -508,7 +477,7 @@ function fillInQrCodeScans($http, $scope, AccessLogService) {
     qrCodeScanRequest.cache = false;
     $http(qrCodeScanRequest).
         success(function (data, status, headers, config) {
-            qrCodeScans = data.record;
+            qrCodeScans = data.resource;
             if (qrCodeScans) {
                 for (i = 0; i < qrCodeScans.length; i += 1) {
                     qrCodeScans[i].scanned = moment(qrCodeScans[i].scannedOn).format('MMM D HH:mm');
@@ -591,20 +560,19 @@ module.controller('QrCodeController', function ($scope, $http, AccessLogService)
 });
 
 /*
-QR code leader board.
+QR code leaderboard.
 */
 module.controller('LeaderBoardController', function ($scope, $http, AccessLogService) {
-    var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
-        qrCodeSummaryRequest = dspRequest('GET', '/db/QrCodeSummary?order=scanCount%20desc,name', null);
+    var qrCodeSummaryRequest = dspRequest('GET', '/team/_table/QrCodeSummary?order=scanCount%20desc,name', null);
     AccessLogService.log('info', 'LeaderBoard');
     $scope.leaders = angular.fromJson(localStorage.getItem('DspQrCodeSummary'));
     $scope.qrcodesummary = angular.fromJson(localStorage.getItem('DspQrCodeSummary'));
     qrCodeSummaryRequest.cache = false;
     $http(qrCodeSummaryRequest).
         success(function (data, status, headers, config) {
-            localStorage.setItem('DspQrCodeSummary', angular.toJson(data.record));
-            $scope.leaders = data.record;
-            if (0 === data.record.length) {
+            localStorage.setItem('DspQrCodeSummary', angular.toJson(data.resource));
+            $scope.leaders = data.resource;
+            if (0 === data.resource.length) {
                 $scope.message = 'Find the QR codes on the mountain and your scans will be listed here.';
             }
         }).
@@ -624,8 +592,7 @@ module.controller('LeaderBoardController', function ($scope, $http, AccessLogSer
 Map.
 */
 module.controller('MapController', function ($scope, $http, AccessLogService) {
-    var role = localStorage.getItem('DspRole'),
-        map = angular.fromJson(localStorage.getItem('OnsMap'));
+    var map = angular.fromJson(localStorage.getItem('OnsMap'));
     AccessLogService.log('info', 'Map', map.name);
     $scope.name = map.name;
     $scope.address = map.address;
@@ -652,14 +619,13 @@ Territory.
 */
 module.controller('TerritoryController', function ($scope, $http, AccessLogService) {
     var territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
-        patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
         patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
         role = localStorage.getItem('DspRole'),
-        trailCheckRequest = dspRequest('GET', '/db/TrailCheck?order=territory,name', null),
-        aedRequest = dspRequest('GET', '/db/Aed?order=territory,location', null),
-        phoneRequest = dspRequest('GET', '/db/Phone?order=territory,name', null),
-        tobogganRequest = dspRequest('GET', '/db/Toboggan?order=territory,name', null),
-        sweepRequest = dspRequest('GET', '/db/Sweep?order=territory,name', null);
+        trailCheckRequest = dspRequest('GET', '/team/_table/TrailCheck?order=territory,name', null),
+        aedRequest = dspRequest('GET', '/team/_table/Aed?order=territory,location', null),
+        phoneRequest = dspRequest('GET', '/team/_table/Phone?order=territory,name', null),
+        tobogganRequest = dspRequest('GET', '/team/_table/Toboggan?order=territory,name', null),
+        sweepRequest = dspRequest('GET', '/team/_table/Sweep?order=territory,name', null);
     AccessLogService.log('info', 'Territory', territory.name);
     $scope.territory = territory.name;
     $scope.hideAeds = hideMenuFor('DspAed');
@@ -674,10 +640,20 @@ module.controller('TerritoryController', function ($scope, $http, AccessLogServi
         $scope.hideToboggans = true;
         $scope.hideSweeps = true;
     }
+    if (patrol.trailCheckLabel) {
+        $scope.trailCheckLabel = patrol.trailCheckLabel;
+    } else {
+        $scope.trailCheckLabel = 'Trail Checks';
+    }
+    if (patrol.sweepLabel) {
+        $scope.sweepLabel = patrol.sweepLabel;
+    } else {
+        $scope.sweepLabel = 'Sweeps';
+    }
     if ('Basic' === role || 'Power' === role || 'Leader' === role) {
         $http(trailCheckRequest).
             success(function (data, status, headers, config) {
-                localStorage.setItem('DspTrailCheck', angular.toJson(data.record));
+                localStorage.setItem('DspTrailCheck', angular.toJson(data.resource));
                 $scope.hideTrailChecks = hideMenuFor('DspTrailCheck');
             }).
             error(function (data, status, headers, config) {
@@ -685,7 +661,7 @@ module.controller('TerritoryController', function ($scope, $http, AccessLogServi
             });
         $http(tobogganRequest).
             success(function (data, status, headers, config) {
-                localStorage.setItem('DspToboggan', angular.toJson(data.record));
+                localStorage.setItem('DspToboggan', angular.toJson(data.resource));
                 $scope.hideToboggans = hideMenuFor('DspToboggan');
             }).
             error(function (data, status, headers, config) {
@@ -693,7 +669,7 @@ module.controller('TerritoryController', function ($scope, $http, AccessLogServi
             });
         $http(sweepRequest).
             success(function (data, status, headers, config) {
-                localStorage.setItem('DspSweep', angular.toJson(data.record));
+                localStorage.setItem('DspSweep', angular.toJson(data.resource));
                 $scope.hideSweeps = hideMenuFor('DspSweep');
             }).
             error(function (data, status, headers, config) {
@@ -702,7 +678,7 @@ module.controller('TerritoryController', function ($scope, $http, AccessLogServi
     }
     $http(aedRequest).
         success(function (data, status, headers, config) {
-            localStorage.setItem('DspAed', angular.toJson(data.record));
+            localStorage.setItem('DspAed', angular.toJson(data.resource));
             $scope.hideAeds = hideMenuFor('DspAed');
         }).
         error(function (data, status, headers, config) {
@@ -710,7 +686,7 @@ module.controller('TerritoryController', function ($scope, $http, AccessLogServi
         });
     $http(phoneRequest).
         success(function (data, status, headers, config) {
-            localStorage.setItem('DspPhone', angular.toJson(data.record));
+            localStorage.setItem('DspPhone', angular.toJson(data.resource));
             $scope.hidePhones = hideMenuFor('DspPhone');
         }).
         error(function (data, status, headers, config) {
@@ -728,13 +704,19 @@ module.controller('TerritoryController', function ($scope, $http, AccessLogServi
 Trail checks.
 */
 module.controller('TrailChecksController', function ($scope, $http, AccessLogService) {
-    var territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
         allTrailChecks = angular.fromJson(localStorage.getItem('DspTrailCheck')),
         trailChecks = [],
         n = 0,
         i = 0;
     AccessLogService.log('info', 'TrailChecks', territory.name);
     $scope.territory = territory.name;
+    if (patrol.trailCheckLabel) {
+        $scope.trailCheckLabel = patrol.trailCheckLabel;
+    } else {
+        $scope.trailCheckLabel = 'Trail Checks';
+    }
     for (i = 0; i < allTrailChecks.length; i += 1) {
         if (allTrailChecks[i].territory === territory.code) {
             trailChecks[n] = allTrailChecks[i];
@@ -824,7 +806,8 @@ module.controller('AedController', function ($scope, $http, AccessLogService) {
 Phones.
 */
 module.controller('PhonesController', function ($scope, $http, AccessLogService) {
-    var territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
+    var role = localStorage.getItem('DspRole'),
+        territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
         allPhones = angular.fromJson(localStorage.getItem('DspPhone')),
         phones = [],
         n = 0,
@@ -834,6 +817,9 @@ module.controller('PhonesController', function ($scope, $http, AccessLogService)
     for (i = 0; i < allPhones.length; i += 1) {
         if (allPhones[i].territory === territory.code) {
             phones[n] = allPhones[i];
+            if ('Guest' === role) {
+                phones[n].name = phones[n].publicName;
+            }
             n = n + 1;
         }
     }
@@ -854,11 +840,17 @@ module.controller('PhonesController', function ($scope, $http, AccessLogService)
 Phone.
 */
 module.controller('PhoneController', function ($scope, $http, AccessLogService) {
-    var phone = angular.fromJson(localStorage.getItem('OnsPhone')),
+    var role = localStorage.getItem('DspRole'),
+        phone = angular.fromJson(localStorage.getItem('OnsPhone')),
         notes;
     AccessLogService.log('info', 'Phone', phone.name);
-    $scope.name = phone.name;
-    $scope.location = phone.location;
+    if ('Basic' === role || 'Power' === role || 'Leader' === role) {
+        $scope.name = phone.name;
+        $scope.location = phone.location;
+    } else {
+        $scope.name = phone.publicName;
+        $scope.location = '';
+    }
     if ((phone.number) && (phone.number.length > 6)) {
         $scope.hide = false;
         $scope.number = phone.number;
@@ -919,7 +911,8 @@ module.controller('NicknamesController', function ($scope, $http, AccessLogServi
 Get elevation of the current position and show vertical gain/loss to target elevation.
 */
 function showVertical($scope, $http, AccessLogService, myLatitude, myLongitude, elevation) {
-    var googleElevationRequest,
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        googleElevationRequest,
         myElevation,
         elevationChangeElement = document.getElementById('elevationChange');
     if (elevation) {
@@ -933,9 +926,17 @@ function showVertical($scope, $http, AccessLogService, myLatitude, myLongitude, 
             success(function (data, status, headers, config) {
                 myElevation = data.results[0].elevation;
                 if (myElevation > elevation) {
-                    elevationChangeElement.innerHTML = 'You are ' + numberWithCommas(Math.round((myElevation - elevation) * 3.28084)) + ' vertical feet above';
+                    if ('USA' === patrol.country) {
+                        elevationChangeElement.innerHTML = 'You are ' + numberWithCommas(Math.round((myElevation - elevation) * 3.28084)) + ' vertical feet above';
+                    } else {
+                        elevationChangeElement.innerHTML = 'You are ' + numberWithCommas(Math.round(myElevation - elevation)) + ' vertical m above';
+                    }
                 } else {
-                    elevationChangeElement.innerHTML = 'You are ' + numberWithCommas(Math.round((elevation - myElevation) * 3.28084)) + ' vertical feet BELOW';
+                    if ('USA' === patrol.country) {
+                        elevationChangeElement.innerHTML = 'You are ' + numberWithCommas(Math.round((elevation - myElevation) * 3.28084)) + ' vertical feet BELOW';
+                    } else {
+                        elevationChangeElement.innerHTML = 'You are ' + numberWithCommas(Math.round(elevation - myElevation)) + ' vertical m BELOW';
+                    }
                 }
             }).
             error(function (data, status, headers, config) {
@@ -949,7 +950,8 @@ function showVertical($scope, $http, AccessLogService, myLatitude, myLongitude, 
 Get the distance and directions to the target.
 */
 function showDirections($scope, $http, AccessLogService, latitude, longitude) {
-    var nickname = angular.fromJson(localStorage.getItem('OnsNickname'));
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        nickname = angular.fromJson(localStorage.getItem('OnsNickname'));
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             function (position) {
@@ -961,12 +963,20 @@ function showDirections($scope, $http, AccessLogService, latitude, longitude) {
                     directionsElement = document.getElementById('directions'),
                     directions,
                     bearing = myWhereabouts.bearingTo(nicknameWhereabouts);
-                if (meters > 1000) {
-                    directions = numberWithCommas(Math.round(meters / 1609.34)) + ' miles';
+                if ('USA' === patrol.country) {
+                    if (meters > 1000) {
+                        directions = numberWithCommas(Math.round(meters / 1609.34)) + ' miles';
+                    } else {
+                        directions = numberWithCommas(Math.round(meters * 1.09361)) + ' yards';
+                    }
                 } else {
-                    directions = numberWithCommas(Math.round(meters * 1.09361)) + ' yards';
+                    if (meters > 1000) {
+                        directions = numberWithCommas(Math.round(meters / 1000)) + ' km';
+                    } else {
+                        directions = numberWithCommas(Math.round(meters)) + ' m';
+                    }
                 }
-                directions = directions + ' ' + writeOutBearing(bearing);
+                directions = 'Location is ' + directions + ' ' + writeOutBearing(bearing);
                 directionsElement.innerHTML = directions;
                 showVertical($scope, $http, AccessLogService, myLatitude, myLongitude, nickname.elevation);
             },
@@ -1071,13 +1081,19 @@ module.controller('TobogganController', function ($scope, $http, AccessLogServic
 Sweeps.
 */
 module.controller('SweepsController', function ($scope, $http, AccessLogService) {
-    var territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        territory = angular.fromJson(localStorage.getItem('OnsTerritory')),
         allSweeps = angular.fromJson(localStorage.getItem('DspSweep')),
         sweeps = [],
         n = 0,
         i = 0;
     AccessLogService.log('info', 'Sweeps', territory.name);
     $scope.territory = territory.name;
+    if (patrol.sweepLabel) {
+        $scope.sweepLabel = patrol.sweepLabel;
+    } else {
+        $scope.sweepLabel = 'Sweeps';
+    }
     for (i = 0; i < allSweeps.length; i += 1) {
         if (allSweeps[i].territory === territory.code) {
             sweeps[n] = allSweeps[i];

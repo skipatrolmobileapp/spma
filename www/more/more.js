@@ -2,13 +2,13 @@
 /*jshint unused: false */
 /*jslint node: true */
 /*jslint indent: 4 */
-/*jslint unparam:true*/
-/*global localStorage, ons, angular, module, dspRequest, moreNavigator, youtube */
+/*jslint unparam:true */
+/*global IN_CORDOVA, device, localStorage, ons, angular, module, dspRequest, moreNavigator, youtube, settingAppName, openAd, havePatience, waitNoMore, niceMessage, sendEmail */
 "use strict";
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2015, Gary Meyer.
+Copyright © 2014-2018, Gary Meyer.
 All rights reserved.
 */
 
@@ -20,8 +20,6 @@ module.controller('MoreController', function ($scope, $http, AccessLogService) {
         patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
         role = localStorage.getItem('DspRole'),
         ads = angular.fromJson(localStorage.getItem('DspAd')),
-        adRequest = dspRequest('GET', '/db/Ad', null),
-        role = localStorage.getItem('DspRole'),
         i;
     AccessLogService.log('info', 'More');
     $scope.enableAd = false;
@@ -34,10 +32,15 @@ module.controller('MoreController', function ($scope, $http, AccessLogService) {
             }
         }
     }
-    if ('WinterPark' === patrolPrefix) {
-        $scope.termsDocName = 'Terms of Service';
+    if ('Guest' === role) {
+        $scope.showPatrollerStuff = false;
     } else {
+        $scope.showPatrollerStuff = true;
+    }
+    if ('Medic52 Team' === settingAppName) {
         $scope.termsDocName = 'Acceptable Use Policy';
+    } else {
+        $scope.termsDocName = 'Terms of Service';
     }
     if ('Demo' === patrolPrefix) {
         $scope.demoMode = true;
@@ -50,17 +53,17 @@ module.controller('MoreController', function ($scope, $http, AccessLogService) {
         openAd($scope.adLinkAddress);
     };
     $scope.viewTerms = function () {
-        if ('WinterPark' === patrolPrefix) {
-            moreNavigator.pushPage('more/terms.html');
-        } else {
+        if ('Medic52 Team' === settingAppName) {
             moreNavigator.pushPage('more/termsm52.html');
+        } else {
+            moreNavigator.pushPage('more/terms.html');
         }
     };
     $scope.viewPrivacy = function () {
-        if ('WinterPark' === patrolPrefix) {
-            moreNavigator.pushPage('more/privacy.html');
-        } else {
+        if ('Medic52 Team' === settingAppName) {
             moreNavigator.pushPage('more/privacym52.html');
+        } else {
+            moreNavigator.pushPage('more/privacy.html');
         }
     };
     ons.ready(function () {
@@ -116,23 +119,27 @@ module.controller('ProfileController', function ($rootScope, $scope, $http, Acce
             $scope.email = data.email;
             $scope.name = data.first_name;
             $scope.phone = data.phone;
+            // TODO: DspName seems unused.
             localStorage.setItem('DspName', data.first_name);
-            getPatrollerRequest = dspRequest('GET', '/db/Patroller?filter=email%3D"' + data.email + '"', null);
-            getPatrollerRequest.cache = false;
-            $http(getPatrollerRequest).
-                success(function (data, status, headers, config) {
-                    if ((data.record) && (data.record.length > 0)) {
-                        localStorage.setItem('OnsPatroller', angular.toJson(data.record[0]));
+            if ('Basic' === role || 'Power' === role || 'Leader' === role) {
+                // TODO: Confirm use of quotes not in DSP 2.x documentation
+                getPatrollerRequest = dspRequest('GET', '/team/_table/Patroller?filter=email%3D"' + data.email + '"', null);
+                getPatrollerRequest.cache = false;
+                $http(getPatrollerRequest).
+                    success(function (data, status, headers, config) {
+                        if ((data.resource) && (data.resource.length > 0)) {
+                            localStorage.setItem('OnsPatroller', angular.toJson(data.resource[0]));
+                            waitNoMore();
+                        } else {
+                            localStorage.removeItem('OnsPatroller');
+                        }
+                    }).
+                    error(function (data, status, headers, config) {
+                        AccessLogService.log('error', 'GetPatrollerErr', niceMessage(data, status));
+                        $scope.message = data.error[0].message;
                         waitNoMore();
-                    } else {
-                        localStorage.removeItem('OnsPatroller');
-                    }
-                }).
-                error(function (data, status, headers, config) {
-                    AccessLogService.log('error', 'GetPatrollerErr', niceMessage(data, status));
-                    $scope.message = data.error[0].message;
-                    waitNoMore();
-                });
+                    });
+            }
         }).
         error(function (data, status, headers, config) {
             AccessLogService.log('warn', 'GetProfileErr', data);
@@ -141,14 +148,18 @@ module.controller('ProfileController', function ($rootScope, $scope, $http, Acce
             waitNoMore();
         });
     $scope.update = function () {
-        var body = {
+        var body = { resource: [{
                 'email': $scope.email,
                 'first_name': $scope.name,
                 'phone': $scope.phone
-            },
+            }]},
             postProfileRequest = dspRequest('POST', '/user/profile', body),
-            patroller = angular.fromJson(localStorage.getItem('OnsPatroller')),
+            patroller = null,
+            patrollerResource = null,
             patrollerRequest = null;
+        if ('Basic' === role || 'Power' === role || 'Leader' === role) {
+            patroller = angular.fromJson(localStorage.getItem('OnsPatroller'));
+        }
         if (!$scope.email) {
             $scope.message = 'Email is required. Try again.';
         } else {
@@ -160,7 +171,12 @@ module.controller('ProfileController', function ($rootScope, $scope, $http, Acce
                         patroller.name = $scope.name;
                         patroller.cellPhone = $scope.phone;
                         patroller.tenantId = patrolPrefix;
-                        patrollerRequest = dspRequest('PUT', '/db/Patroller', patroller);
+                        patrollerResource = {
+                            resource: [
+                                patroller
+                            ]
+                        };
+                        patrollerRequest = dspRequest('PUT', '/team/_table/Patroller', patrollerResource);
                         $http(patrollerRequest).
                             success(function (data, status, headers, config) {
                                 localStorage.setItem('DspName', $scope.name);
@@ -173,7 +189,7 @@ module.controller('ProfileController', function ($rootScope, $scope, $http, Acce
                                 waitNoMore();
                             });
                     } else {
-                        patroller = {
+                        patrollerResource = { resource: [{
                             'tenantId': patrolPrefix,
                             'email': $scope.email,
                             'name': $scope.name,
@@ -183,9 +199,9 @@ module.controller('ProfileController', function ($rootScope, $scope, $http, Acce
                             'alternatePhone': '',
                             'scheduleIndicator': '',
                             'additionalEmail': ''
-                        };
+                        }]};
                         if ('Guest' !== role) {
-                            patrollerRequest = dspRequest('POST', '/db/Patroller', patroller);
+                            patrollerRequest = dspRequest('POST', '/team/_table/Patroller', patrollerResource);
                             $http(patrollerRequest).
                                 success(function (data, status, headers, config) {
                                     $scope.message = 'Profile created.';
@@ -252,6 +268,7 @@ module.controller('PasswordController', function ($rootScope, $scope, $http, Acc
                 success(function (data, status, headers, config) {
                     AccessLogService.log('info', 'ChangePassword');
                     $scope.message = 'Password changed.';
+                    localStorage.setItem('DspPassword', $scope.newPassword);
                     waitNoMore();
                     moreNavigator.popPage();
                 }).
@@ -390,6 +407,10 @@ module.controller('LogoutController', function ($rootScope, $scope, $http, Acces
     localStorage.removeItem('OnsTerritory');
     localStorage.removeItem('OnsToboggan');
     localStorage.removeItem('OnsTrailCheck');
+    localStorage.removeItem('NspOnlineUser');
+    localStorage.removeItem('NspOnlineToken');
+    localStorage.removeItem('NspOnlineUserInfo');
+    localStorage.removeItem('NspOnlineUserAssignments');
     $rootScope.hideTabs = true;
     $http(sessionRequest).
         success(function (data, status, headers, config) {

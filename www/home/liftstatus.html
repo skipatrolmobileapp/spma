@@ -25,6 +25,9 @@
                 </ons-col>
             </ons-row>
         </div>
+        <div class="centered" ng-show="!lifts || lifts.length === 0">
+            <p>No lifts reported as running</p>
+        </div>
         <div class="centered fineprint">
             Lift status provided by
         </div>
@@ -35,13 +38,4 @@
             {{patrolName}}
         </div>
     </div>
-    <!--
-    <div class="inset">
-      <ons-button modifier="large outline tappable" ng-click="close()">
-        <ons-icon icon="fa-chevron-left" fixed-width="true">
-        </ons-icon>
-        Back
-      </ons-button>
-    </div>
-    -->
 </ons-page>

@@ -3,21 +3,10 @@
         <div class="inset">
             &nbsp;
         </div>
-        <!--
-        <div>
-            <ons-list>
-                <ons-list-item class="centered">
-                    <ons-icon icon="fa-home" fixed-width="true">
-                    </ons-icon>
-                    Home
-                </ons-list-item>
-            </ons-list>
-        </div>
-        -->
         <img alt="Ad Not Available" width="100%" ng-src="{{adImageAddress}}" ng-show="enableAd" ng-click="adClick()"></a>
         <ons-list>
             <ons-list-header ng-show="enablePosting">
-                Updates
+                Patrol Updates
             </ons-list-header>
             <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/posts.html')" ng-show="enablePosting">
                 <ons-icon icon="fa-comment-o" fixed-width="true">
@@ -40,13 +29,20 @@
                 </ons-icon>
                 {{warningsTeaser}}
             </ons-list-item>
-            <ons-list-header ng-hide="hideWeather">
+            <ons-list-header ng-show="currentWeather || openWeather">
                 Current Weather
             </ons-list-header>
-            <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/currentweather.html')" ng-hide="hideWeather">
+            <!--
+            <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/currentweather.html')" ng-show="currentWeather">
                 <ons-icon icon="ion-thermometer" fixed-width="true">
                 </ons-icon>
                 {{currentWeather}}
+            </ons-list-item>
+            -->
+            <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/openweather.html')" ng-show="openWeather">
+                <ons-icon icon="ion-thermometer" fixed-width="true">
+                </ons-icon>
+                {{openWeather}}
             </ons-list-item>
             <ons-list-header ng-hide="hideWeather">
                 Weather Forecast
@@ -80,9 +76,9 @@
             <ons-list-item class="navigable" modifier="chevron tappable" ng-repeat="area in areas" ng-click="showTrails($index)" ng-hide="{{'hideMtnXml'}}">
                 <ons-icon icon="ion-image" fixed-width="true">
                 </ons-icon>
-                {{area.name}} - {{area.trailsOpen}}
+                {{area.name}} {{area.trailsOpen}}
             </ons-list-item>
-            <ons-list-header ng-show="liveCams">
+            <ons-list-header ng-show="liveCams || travelCams">
                 Live Cams
             </ons-list-header>
             <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/livecams.html')" ng-show="liveCams">

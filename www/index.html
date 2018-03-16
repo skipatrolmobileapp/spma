@@ -1,56 +1,40 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <!-- Ski Patrol Mobile App -->
-<!-- Copyright © 2014-2015, Gary Meyer. -->
+<!-- Copyright © 2014-2018, Gary Meyer. -->
 <!-- All rights reserved. -->
-<!-- Note the commented sections for branding. -->
 
 <head>
     <title>
-        <!-- BRANDING: The name of the app -->
         Ski Patrol
-        <!-- Medic52 Team -->
     </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src https://api-skipatrol.rhcloud.com https://maps.google.com https://maps.googleapis.com https://maps.gstatic.com https://debug.monaca.mobi:8080 * 'unsafe-inline' 'unsafe-eval' data:;">
+    <!--
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: 'unsafe-inline' 'unsafe-eval'">
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
     <script src="components/loader.js">
     </script>
     <link rel="stylesheet" href="components/loader.css">
-    <!-- BRANDING: Onsen.UI Theme Roller-generated branding -->
-    <link rel="stylesheet" href="css/onsen-css-components.min.css">
-    <!-- BRANDING: Additional theming beyond theme roller -->
-    <link rel="stylesheet" href="css/app.css">
-    <!--
-    <link rel="stylesheet" href="css/medic52-onsen-css-components.min.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Play' type='text/css'>
+    <!-- BEGIN BRANDING -->
+    <link rel="stylesheet" href="css/medic52-onsen-css-components.css">
     <link rel="stylesheet" href="css/medic52-app.css">
-    -->
     <script>
-        // BRANDING: Text on intro screen of registration
         var settingAppName = 'the Ski Patrol Mobile App',
-            // BRANDING: Which screen to use to pick the patrol in registration
             settingPickPatrolScreen = 'home/pickwinterpark.html',
-            // BRANDING: Whether or not to display upgrade teasers throughout the app
-            settingTease = true,
-            // BRANDING: Whether or not to display upgrade teasers throughout the app
-            settingSnowConditionsImage = 'img/whitemountain.png',
-            // BRANDING: How it appears in the AccessLog table
-            settingLoggingAppId = 'SPMA252';
-    </script>
-    <!--
-    <script>
-        var settingAppName = 'Medic52 Team',
-            settingPickPatrolScreen = 'home/pickpatrol.html',
             settingTease = true,
             settingSnowConditionsImage = 'img/blackmountain.png',
-            settingLoggingAppId = 'M52TM250';
+            settingLoggingAppId = 'SPMA300';
     </script>
-    -->
+    <!-- NOTE ALSO ICON AND SPLASH SCREEN IMAGE REFERENCES IN CONFIG.XML -->
+    <!-- END BRANDING -->
     <script src="components/moment/moment.js">
     </script>
     <script src="components/angular-touch/angular-touch.js">
     </script>
-    <!-- version 1.6.0, compatiable with Cordova 4.1.0 -->
+    <!-- version 1.6.0, compatiable with Cordova -->
     <script src="components/jsSHA/sha1.js">
     </script>
     <script src="app.js">
@@ -60,6 +44,8 @@
     <script src="logistics/latlong.js">
     </script>
     <script src="logistics/logistics.js">
+    </script>
+    <script src="personal/personal.js">
     </script>
     <script src="patrol/patrol.js">
     </script>
@@ -72,15 +58,17 @@
 <body>
     <ons-toolbar class="navigation_bar toolbar" style="margin-top: 0px;">
         <div class="center">
-            <!-- BRANDING: App title bar -->
+            <!-- SPMA <span class="navigation-bar__line-height navigation-bar__title" style="color: #ffffff;"> -->
             <span class="navigation-bar__line-height navigation-bar__title">
+                <!-- 
                 <ons-icon icon="fa-plus" fixed-width="true">
                 </ons-icon>
                 Ski Patrol
-            </span>
-            <!--
-            Medic52 Team
-            -->
+                -->
+                <ons-icon icon="fa-plus" fixed-width="true">
+                </ons-icon>
+                <b>Ski Patrol</b>
+            </span>            
         </div>
     </ons-toolbar>
     <ons-modal var="spinnerModal">
@@ -94,15 +82,22 @@
         </ons-icon>
     </ons-modal>
     <ons-tabbar hide-tabs="{{$root.hideTabs}}">
-        <ons-tab page="home/homenav.html" label="Home" icon="fa-home" active="true">
+        <ons-tab icon="fa-home" page="home/homenav.html" active="true">
         </ons-tab>
-        <ons-tab page="logistics/logisticsnav.html" label="Mountain" icon="ion-images">
+        <ons-tab icon="ion-images" page="logistics/logisticsnav.html">
         </ons-tab>
-        <ons-tab page="patrol/patrolnav.html" label="Patrol" icon="fa-users">
+        <ons-tab ng-show="{{'showPersonalTab'}}" icon="ion-ios-person" page="personal/personalnav.html">
         </ons-tab>
-        <ons-tab page="more/morenav.html" label="More" icon="fa-ellipsis-h">
+        <ons-tab icon="ion-ios-people" page="patrol/patrolnav.html">
+        </ons-tab>
+        <ons-tab icon="fa-ellipsis-h" page="more/morenav.html">
         </ons-tab>
     </ons-tabbar>
+    <p>
+        Welcome.
+    </p>
+</div>
+    
 </body>
 
 </html>

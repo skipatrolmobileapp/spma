@@ -4,17 +4,6 @@
             <div class="inset">
                 &nbsp;
             </div>
-            <!--
-            <div>
-                <ons-list>
-                    <ons-list-item class="centered">
-                        <ons-icon icon="ion-images" fixed-width="true">
-                        </ons-icon>
-                        Mountain
-                    </ons-list-item>
-                </ons-list>
-            </div>
-            -->
             <img alt="Ad Not Available" width="100%" ng-src="{{adImageAddress}}" ng-show="{{'enableAd'}}" ng-click="adClick()"></a>
             <ons-list>
                 <div ng-show="showLocationFinder">
@@ -56,7 +45,7 @@
                     {{map.name}}
                 </ons-list-item>
                 <ons-list-header>
-                    Areas
+                    {{territoryLabel}}
                 </ons-list-header>
                 <ons-list-item class="navigable" modifier="chevron tappable" ng-repeat="territory in territories" ng-click="viewTerritory($index)">
                     <ons-icon icon="fa-photo" fixed-width="true">
