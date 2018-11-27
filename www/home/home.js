@@ -273,26 +273,22 @@ module.controller('LoginController', function ($rootScope, $scope, $http, Access
     };
     $scope.resetPassword = function () {
         var body = {
-                email: $scope.email
+                email: user
             },
             passwordResetRequest = dspRequest('POST', '/user/password?reset=true', body);
-        if (!$scope.email) {
-            $scope.message = 'Email is required. Try again.';
-        } else {
-            havePatience($rootScope);
-            $http(passwordResetRequest).
-                success(function (data, status, headers, config) {
-                    AccessLogService.log('info', 'LostPassword');
-                    $scope.message = ('Check your email for a link to reset your password.');
-                    localStorage.removeItem('DspPassword');
-                    waitNoMore();
-                }).
-                error(function (data, status, headers, config) {
-                    AccessLogService.log('error', 'LostPasswordErr', niceMessage(data, status));
-                    $scope.message = niceMessage(data, status);
-                    waitNoMore();
-                });
-        }
+          havePatience($rootScope);
+          $http(passwordResetRequest).
+              success(function (data, status, headers, config) {
+                  AccessLogService.log('info', 'LostPassword');
+                  $scope.message = ('Check your email for a link to generate a new confirmation code.');
+                  localStorage.removeItem('DspPassword');
+                  waitNoMore();
+              }).
+              error(function (data, status, headers, config) {
+                  AccessLogService.log('error', 'LostPasswordErr', niceMessage(data, status));
+                  $scope.message = niceMessage(data, status);
+                  waitNoMore();
+              });
     };
     $scope.register = function () {
         homeNavigator.resetToPage('home/introv3.html');
