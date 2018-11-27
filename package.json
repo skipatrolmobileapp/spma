@@ -10,7 +10,8 @@
             "cordova-plugin-inappbrowser": {},
             "cordova-plugin-geolocation": {},
             "cordova-plugin-camera": {},
-            "cordova-plugin-whitelist": {}
+            "cordova-plugin-whitelist": {},
+            "cordova-plugin-statusbar": {}
         }
     },
     "dependencies": {
@@ -22,7 +23,8 @@
         "cordova-plugin-inappbrowser": "2.0.1",
         "cordova-plugin-geolocation": "4.0.1",
         "cordova-plugin-camera": "4.0.1",
-        "cordova-plugin-whitelist": "1.3.3"
+        "cordova-plugin-whitelist": "1.3.3",
+        "cordova-plugin-statusbar": "2.4.1"
     },
     "scripts": {
         "monaca:preview": "npm run dev",

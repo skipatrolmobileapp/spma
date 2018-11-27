@@ -12,11 +12,7 @@ Copyright © 2014-2018, Gary Meyer.
 All rights reserved.
 */
 
-/*
-Global initialization indicator and URL to reset test suite.
-*/
-var haveInitializedApp = false,
-    RESET_TESTING_URL = "https://api.medic52team.com/api/v2/testing/_proc/SetupTestSuite";
+var haveInitializedApp = false;
 
 /*
 Start the app. Direct the user to register, login, or just show the live home screen.
@@ -44,6 +40,7 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
         registrationRequest = dspRequest('POST', '/user/register?login=true', regBody),
         sessionRequest = dspRequest('POST', '/user/session', body),
         patrolRequest = dspRequest('GET', '/team/_table/PatrolOrg?filter=tenantId="' + patrolPrefix + '"', null);
+    AccessLogService.log('info', 'Home', 'Load');
     $http(adRequest).
         success(function (data, status, headers, config) {
             localStorage.setItem('DspAd', angular.toJson(data.resource));
@@ -53,109 +50,197 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
         });
     $rootScope.homeTab = true;
     $rootScope.logisticsTab = null;
-    if (password) {
-        if (haveInitializedApp) {
-            $rootScope.hideTabs = false;
-            if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-                // Don't show until fully implenented.
-                // $rootScope.showPersonalTab = true;
-                $rootScope.showPersonalTab = false;
-            }
-            homeNavigator.resetToPage('home/live.html', {animation: 'none'});
-        } else {
-            if (introDone && moment(introDone).format('YYYY') < 2018) {
-                AccessLogService.log('info', 'Home', 'Upgrade');
-                registrationRequest.headers.Authorization = null;
-                console.debug('JSON: ' + JSON.stringify(registrationRequest));
-                console.debug('JSON: ' + JSON.stringify(regBody));
-                $http(registrationRequest).
-                    success(function (data, status, headers, config) {
-                        console.debug('SUCCESS!');
-                    }).
-                    error(function (data, status, headers, config) {
-                        console.debug("FAIL: " + JSON.stringify(data));
-                    });
-            } else {
-                AccessLogService.log('info', 'Home', 'Load');
-                havePatience($rootScope);
-                $scope.loading = '';
-                $http(sessionRequest).
-                    success(function (data, status, headers, config) {
-                        $scope.loading = '';
-                        localStorage.setItem('DspUserId', data.id);
-                        localStorage.setItem('DspEmail', body.email);
-                        localStorage.setItem('DspPassword', body.password);
-                        localStorage.setItem('DspRole', data.role);
-                        localStorage.setItem('DspName', data.first_name);
-                        localStorage.setItem('DspPatrolPrefix', data.last_name);
-                        AccessLogService.log('info', 'Session', data.first_name);
-                        $http(patrolRequest).
-                            success(function (data, status, headers, config) {
-                                var alertRoles,
-                                    i;
-                                localStorage.setItem('DspPatrol', angular.toJson(data.resource[0]));
-                                $scope.loading = '';
-                                haveInitializedApp = true;
-                                $rootScope.hideTabs = false;
-                                if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-                                    // Don't show until fully implemented.
-                                    // $rootScope.showPersonalTab = true;
-                                    $rootScope.showPersonalTab = false;
-                                }
-                                homeNavigator.resetToPage('home/live.html', {animation: 'none'});
-                                waitNoMore();
-                                if (data.resource[0].alert) {
-                                    alertRoles = data.resource[0].alertRolesCsv.split(',');
-                                    for (i = 0; i < alertRoles.length; i += 1) {
-                                        if ((alertRoles[i] === role) && (data.resource[0].alert)) {
-                                            ons.notification.alert({
-                                                "title": "Notice",
-                                                "message": data.resource[0].alert
-                                            });
-                                        }
-                                    }
-                                }
-                            }).
-                            error(function (data, status, headers, config) {
-                                AccessLogService.log('info', 'PatrolErr', data);
-                                $rootScope.hideTabs = false;
-                                if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-                                    // Don't show until fully implemented.
-                                    // $rootScope.showPersonalTab = true;
-                                    $rootScope.showPersonalTab = false;
-                                }
-                                homeNavigator.resetToPage('home/live.html', {animation: 'none'});
-                                waitNoMore();
-                            });
-                    }).
-                    error(function (data, status, headers, config) {
-                        AccessLogService.log('info', 'SessionErr', data);
-                        if ((data) && (data.error) && (data.error[0]) && ('Invalid user name and password combination.' === data.error[0].message)) {
-                            homeNavigator.resetToPage('home/login.html', {animation: 'none'});
-                        } else {
-                            $rootScope.hideTabs = false;
-                            if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-                                // Don't show until fully implemented.
-                                // $rootScope.showPersonalTab = true;
-                                $rootScope.showPersonalTab = false;
-                            }
-                            homeNavigator.resetToPage('home/live.html', {animation: 'none'});
-                        }
-                        waitNoMore();
-                    });
-            }
+    if (haveInitializedApp) {
+        $rootScope.hideTabs = false;
+        if ('Basic' === role || 'Power' === role || 'Leader' === role) {
+            // Don't show personal tab until fully implenented.
+            // $rootScope.showPersonalTab = true;
+            $rootScope.showPersonalTab = false;
         }
+        homeNavigator.resetToPage('home/live.html', {animation: 'none'});
     } else {
-        if (introDone) {
-            AccessLogService.log('info', 'Home', 'Login');
-            $rootScope.hideTabs = true;
-            homeNavigator.resetToPage('home/login.html', {animation: 'none'});
+        if (!password) {
+            if (!email) {
+                $rootScope.hideTabs = true;
+                homeNavigator.resetToPage('home/introv3.html', {animation: 'none'});
+            } else {
+                $rootScope.hideTabs = true;
+                homeNavigator.resetToPage('home/login.html', {animation: 'none'});
+            }
         } else {
-            AccessLogService.log('info', 'Home', 'Register');
-            $rootScope.hideTabs = true;
-            homeNavigator.resetToPage('home/intro.html', {animation: 'none'});
+          $http(sessionRequest).
+              success(function (data, status, headers, config) {
+                  $scope.loading = '';
+                  localStorage.setItem('DspUserId', data.id);
+                  localStorage.setItem('DspEmail', body.email);
+                  localStorage.setItem('DspPassword', body.password);
+                  localStorage.setItem('DspRole', data.role);
+                  localStorage.setItem('DspName', data.first_name);
+                  localStorage.setItem('DspPatrolPrefix', data.last_name);
+                  AccessLogService.log('info', 'Session', data.first_name);
+                  $http(patrolRequest).
+                      success(function (data, status, headers, config) {
+                          var alertRoles,
+                              i;
+                          localStorage.setItem('DspPatrol', angular.toJson(data.resource[0]));
+                          $scope.loading = '';
+                          haveInitializedApp = true;
+                          $rootScope.hideTabs = false;
+                          if ('Basic' === role || 'Power' === role || 'Leader' === role) {
+                              // Don't show personal tab until fully implemented.
+                              // $rootScope.showPersonalTab = true;
+                              $rootScope.showPersonalTab = false;
+                          }
+                          homeNavigator.resetToPage('home/live.html', {animation: 'none'});
+                          waitNoMore();
+                          if (data.resource[0].alert) {
+                              alertRoles = data.resource[0].alertRolesCsv.split(',');
+                              for (i = 0; i < alertRoles.length; i += 1) {
+                                  if ((alertRoles[i] === role) && (data.resource[0].alert)) {
+                                      ons.notification.alert({
+                                          "title": "Notice",
+                                          "message": data.resource[0].alert
+                                      });
+                                  }
+                              }
+                          }
+                      }).
+                      error(function (data, status, headers, config) {
+                          AccessLogService.log('info', 'PatrolErr', data);
+                          $rootScope.hideTabs = false;
+                          if ('Basic' === role || 'Power' === role || 'Leader' === role) {
+                              // Don't show until fully implemented.
+                              // $rootScope.showPersonalTab = true;
+                              $rootScope.showPersonalTab = false;
+                          }
+                          homeNavigator.resetToPage('home/live.html', {animation: 'none'});
+                          waitNoMore();
+                      });
+              }).
+              error(function (data, status, headers, config) {
+                  AccessLogService.log('info', 'SessionErr', data);
+                  $rootScope.hideTabs = true;
+                  homeNavigator.resetToPage('home/introv3.html', {animation: 'none'});
+              });
         }
     }
+
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Let the user register with the new, simple email-based registration scheme.
+*/
+module.controller('IntroV3Controller', function ($rootScope, $scope, $http, AccessLogService) {
+    AccessLogService.log('info', 'Intro');
+    localStorage.removeItem('DspPatrolPrefix');
+    localStorage.removeItem('DspEmail');
+    localStorage.removeItem('DspPassword');
+    $scope.setup = function () {
+        var email = $scope.email,
+            getPatrollerRequest = null;
+        $scope.message = 'Checking email...';
+        if (!$scope.email) {
+            $scope.message = 'Email address is required for set up.';
+        } else {
+            email = $scope.email.trim();
+            getPatrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null),
+            localStorage.setItem('DspEmail', email);
+            $http(getPatrollerRequest).
+                success(function (data, status, headers, config) {
+                    var patrolPrefix = null,
+                        body = {
+                            email: email,
+                            first_name: '',
+                            last_name: '',
+                            display_name: ''
+                        },
+                        registrationRequest = null;
+                    AccessLogService.log('info', 'GetPatroller');
+                    if (1 === data.length) {
+                        patrolPrefix = data[0].tenantId;
+                        localStorage.setItem('DspPatrolPrefix', patrolPrefix);
+                        body.first_name = data[0].name;
+                        body.last_name = patrolPrefix;
+                        body.display_name = data[0].name + ' (' + patrolPrefix + ')';
+                        registrationRequest = dspRequest('POST', '/user/register', body);
+                        $scope.message = 'Registering as patroller...';
+                        $http(registrationRequest).
+                            success(function (data, status, headers, config) {
+                                AccessLogService.log('info', 'Registration');
+                                homeNavigator.pushPage('home/confirmationv3.html');
+                                waitNoMore();
+                            }).
+                            error(function (data, status, headers, config) {
+                                var resetBody = {
+                                  email: $scope.email
+                                },
+                                passwordResetRequest = dspRequest('POST', '/user/password?reset=true', resetBody);
+                                AccessLogService.log('warn', 'RegistrationErr', niceMessage(data, status));
+                                $http(passwordResetRequest).
+                                    success(function (data, status, headers, config) {
+                                        AccessLogService.log('info', 'LostPassword');
+                                        homeNavigator.pushPage('home/confirmationv3.html');
+                                        localStorage.removeItem('DspPassword');
+                                        waitNoMore();
+                                    }).
+                                    error(function (data, status, headers, config) {
+                                        AccessLogService.log('error', 'LostPasswordErr', niceMessage(data, status));
+                                        $scope.message = niceMessage(data, status);
+                                        waitNoMore();
+                                    });
+                            });
+                    } else {
+                        $scope.message = 'Registering as guest...';
+                        // homeNav to a pick resort screen...
+                    }
+                    waitNoMore();
+                }).
+               error(function (data, status, headers, config) {
+                    AccessLogService.log('warn', 'GetPatrollerErr', niceMessage(data, status));
+                    $scope.message = niceMessage(data, status);
+                    waitNoMore();
+                });
+        }
+    };
+    $scope.exit = function () {
+        navigator.app.exitApp();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Let the user know they still need to confirm their account via the email sent.
+*/
+module.controller('ConfirmationV3Controller', function ($scope, $http, AccessLogService) {
+    AccessLogService.log('info', 'ConfirmationLinkSent');
+    localStorage.setItem('OnsIntroDone', new Date());
+    $scope.restart = function () {
+        homeNavigator.resetToPage('home/home.html');
+    };
+    $scope.exit = function () {
+        navigator.app.exitApp();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Let the user send me an email for help.
+*/
+module.controller('RegErrorController', function ($scope, AccessLogService) {
+    AccessLogService.log('info', 'RegError');
+    $scope.email = function () {
+        sendEmail('gary@meyer.net', 'Ski%20Patrol%20Mobile%20App%20Registration%20Error');
+    };
+    $scope.exit = function () {
+        navigator.app.exitApp();
+    };
     ons.ready(function () {
         return;
     });
@@ -473,7 +558,7 @@ module.controller('LoginController', function ($rootScope, $scope, $http, Access
         }
     };
     $scope.register = function () {
-        homeNavigator.resetToPage('home/intro.html');
+        homeNavigator.resetToPage('home/introv3.html');
     };
     $scope.exit = function () {
         navigator.app.exitApp();

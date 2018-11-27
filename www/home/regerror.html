@@ -1,14 +1,14 @@
-<ons-page ng-controller="HelpController" modifier="full_bg">
+<ons-page ng-controller="RegErrorController" modifier="full_bg" ng-device-backbutton="exit()">
     <div class="inset">
         &nbsp;
     </div>
-    <div class="inset" ng-swipe-right="close()">
+    <div class="inset">
         <div>
             <ons-list>
                 <ons-list-item class="centered">
-                    <ons-icon icon="fa-info" fixed-width="true">
+                    <ons-icon icon="fa-exclamation" fixed-width="true">
                     </ons-icon>
-                    Info
+                    Error
                 </ons-list-item>
             </ons-list>
         </div>
@@ -16,14 +16,14 @@
             <img src="img/gary.jpg" class="framed" alt="Gary Meyer" />
         </div>
         <div class="inset copy">
-            If you have a question, need help, found a defect, or have an idea to offer, feel free to contact me. - Gary
+            Sorry, there was a technical issue processing your registration. Feel free to contact me for help. - Gary
         </div>
         <div ng-click="email()">
             <ons-list>
                 <ons-list-item class="centered navigable" modifier="tappable">
                     <ons-icon icon="fa-envelope" fixed-width="true">
                     </ons-icon>
-                    gary@meyer.com
+                    gary@meyer.net
                 </ons-list-item>
             </ons-list>
         </div>
@@ -31,13 +31,4 @@
             Version 3.0.0
         </div>
     </div>
-    <!--
-    <div class="inset">
-      <ons-button modifier="large outline tappable" ng-click="close()">
-        <ons-icon icon="fa-chevron-left" fixed-width="true">
-        </ons-icon>
-        Back
-      </ons-button>
-    </div>
-    -->
 </ons-page>
