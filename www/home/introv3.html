@@ -20,14 +20,14 @@
             <div class="inset">
                 Set up is three easy steps. First, enter your email address as it is in the patrol roster. 
                 Second, we'll send you an email to generate a confirmation code. 
-                Third, restart the app and enter the confirmation code.
+                Third, enter that confirmation code in the app.
                 Then you're good to go.
             </div>
             <div class="inset">
                 <input my-focus type="email" class="text-input" ng-model="email" placeholder="Email" style="width: 100%">
             </div>
             <div class="inset">
-                (Note: Entering a fake email address will not enable you to get a confirmation code.)
+                Entering a fake email address will not enable you to get a confirmation code.
             </div>
         </div>
         <div class="centered">
@@ -36,6 +36,13 @@
                 </ons-icon>
                 Set up
             </ons-button>
+        </div>
+        <div class="inset centered">
+            By using this application, you accept the
+            <span class="inlinelink" modifier="tappable" onclick="homeNavigator.pushPage('home/regterms.html')">
+      Terms of Service
+    </span> and
+            <span class="inlinelink" modifier="tappable" onclick="homeNavigator.pushPage('home/regprivacy.html')">Privacy Policy</span>.
         </div>
     </div>
 </ons-page>

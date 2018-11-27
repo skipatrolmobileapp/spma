@@ -138,6 +138,7 @@ module.controller('IntroV3Controller', function ($rootScope, $scope, $http, Acce
     localStorage.removeItem('DspPatrolPrefix');
     localStorage.removeItem('DspEmail');
     localStorage.removeItem('DspPassword');
+    $scope.focusElement = "email";
     $scope.setup = function () {
         var email = $scope.email,
             getPatrollerRequest = null;
@@ -170,7 +171,7 @@ module.controller('IntroV3Controller', function ($rootScope, $scope, $http, Acce
                         $http(registrationRequest).
                             success(function (data, status, headers, config) {
                                 AccessLogService.log('info', 'Registration');
-                                homeNavigator.pushPage('home/confirmationv3.html');
+                                homeNavigator.pushPage('home/login.html');
                                 waitNoMore();
                             }).
                             error(function (data, status, headers, config) {
@@ -182,7 +183,7 @@ module.controller('IntroV3Controller', function ($rootScope, $scope, $http, Acce
                                 $http(passwordResetRequest).
                                     success(function (data, status, headers, config) {
                                         AccessLogService.log('info', 'LostPassword');
-                                        homeNavigator.pushPage('home/confirmationv3.html');
+                                        homeNavigator.pushPage('home/login.html');
                                         localStorage.removeItem('DspPassword');
                                         waitNoMore();
                                     }).
@@ -214,23 +215,6 @@ module.controller('IntroV3Controller', function ($rootScope, $scope, $http, Acce
 });
 
 /*
-Let the user know they still need to confirm their account via the email sent.
-*/
-module.controller('ConfirmationV3Controller', function ($scope, $http, AccessLogService) {
-    AccessLogService.log('info', 'ConfirmationLinkSent');
-    localStorage.setItem('OnsIntroDone', new Date());
-    $scope.restart = function () {
-        homeNavigator.resetToPage('home/home.html');
-    };
-    $scope.exit = function () {
-        navigator.app.exitApp();
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
 Let the user send me an email for help.
 */
 module.controller('RegErrorController', function ($scope, AccessLogService) {
@@ -247,275 +231,28 @@ module.controller('RegErrorController', function ($scope, AccessLogService) {
 });
 
 /*
-Get the user going on a new registration.
-*/
-module.controller('IntroController', function ($rootScope, $scope, $http, AccessLogService) {
-    AccessLogService.log('info', 'Intro');
-    if (!settingAppName) {
-        settingAppName = 'the Ski Patrol Mobile App'; // jshint ignore:line
-    }
-    $scope.settingAppName = settingAppName;
-    localStorage.removeItem('DspPassword');
-    $scope.start = function () {
-        var patrolRequest = dspRequest('GET', '/team/_table/PatrolOrg?order=patrolName', null);
-        havePatience($rootScope);
-        $http(patrolRequest).
-            success(function (data, status, headers, config) {
-                localStorage.setItem('DspAllPatrol', angular.toJson(data.resource));
-                waitNoMore();
-                homeNavigator.pushPage('home/name.html');
-            }).
-            error(function (data, status, headers, config) {
-                AccessLogService.log('error', 'GetPatrolErr', niceMessage(data, status));
-                waitNoMore();
-            });        
-    };
-    $scope.login = function () {
-        homeNavigator.resetToPage('home/login.html');
-    };
-    $scope.exit = function () {
-        navigator.app.exitApp();
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
-Ask the user their name.
-*/
-module.controller('NameController', function ($scope, $http, AccessLogService) {
-    var testingRequest = {
-            'method': 'GET',
-            'cache': false,
-            'timeout': 8000,
-            'url': RESET_TESTING_URL,
-            'headers': {
-                'X-DreamFactory-API-Key': DSP_API_KEY
-            }
-        };
-    AccessLogService.log('info', 'Name');
-    $scope.firstName = localStorage.getItem('OnsFirstName');
-    $scope.lastName = localStorage.getItem('OnsLastName');
-    $scope.message = 'Enter your first name and last name in the fields below. Then tap "Next."';
-    $scope.next = function () {
-        if ((!$scope.firstName) || (!$scope.lastName)) {
-            $scope.message = 'Name is required for registration.';
-        } else {
-            if ('Test' == $scope.lastName) {
-                $http(testingRequest).
-                    success(function (data, status, headers, config) {
-                        AccessLogService.log('info', 'SetupTestSuite', 'Ready');
-                    }).
-                    error(function (data, status, headers, config) {
-                        AccessLogService.log('error', 'SetupTestSuiteErr', niceMessage(data, status));
-                    });
-            }
-            $scope.message = null;
-            localStorage.setItem('OnsFirstName', $scope.firstName);
-            localStorage.setItem('OnsLastName', $scope.lastName);
-            if (!settingPickPatrolScreen) {
-                settingPickPatrolScreen = 'home/pickpatrol.html'; // jshint ignore:line
-            }
-            homeNavigator.pushPage(settingPickPatrolScreen);
-        }
-    };
-    $scope.back = function () {
-        homeNavigator.popPage();
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
-Ask the user which patrol they are part of.
-*/
-module.controller('PickPatrolController', function ($scope, $http, AccessLogService) {
-    var patrols = angular.fromJson(localStorage.getItem('DspAllPatrol'));
-    AccessLogService.log('info', 'PickPatrol');
-    $scope.patrols = [];
-    $scope.patrolName = localStorage.getItem('DspPatrolName');
-    $scope.message = 'Start typing the name of your resort in the field below. Select. Then tap "Next."';
-    $scope.focusElement = 'patrolName';
-    $scope.search = function (patrolName) {
-        var n = 0,
-            i = 0;
-        $scope.patrols = [];
-        patrolName = patrolName.toLowerCase();
-        if ((patrolName) && (patrolName.length > 1)) {
-            for (i = 0; i < patrols.length; i += 1) {
-                if ((patrols[i].patrolName) && (patrols[i].patrolName.toLowerCase().indexOf(patrolName) > -1)) {
-                    $scope.patrols[n] = patrols[i];
-                    n += 1;
-                }
-            }
-        }
-    };
-    $scope.tap = function (index) {
-        var patrol = $scope.patrols[index];
-        if (patrol) {
-            if (patrol.patrolName) {
-                $scope.patrolName = $scope.patrols[index].patrolName;
-                localStorage.setItem('DspPatrolName', $scope.patrols[index].patrolName);
-            }
-            if (patrol.tenantId) {
-                localStorage.setItem('DspPatrolPrefix', $scope.patrols[index].tenantId);
-            }
-        }
-        $scope.patrols = [];
-    };
-    $scope.back = function () {
-        homeNavigator.popPage();
-    };
-    $scope.next = function () {
-        var patrolName = localStorage.getItem('DspPatrolName');
-        if (!patrolName) {
-            $scope.message = 'Patrol is required for registration.';
-        } else {
-            $scope.message = null;
-            homeNavigator.pushPage('home/tsandcsm52.html');
-        }
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
-Assume user is part of Winter Park.
-*/
-module.controller('PickWinterParkController', function ($scope, $http, AccessLogService) {
-    AccessLogService.log('info', 'PickWinterPark');
-    $scope.back = function () {
-        homeNavigator.popPage();
-    };
-    $scope.next = function () {
-        localStorage.setItem('DspPatrolName', 'Winter Park');
-        localStorage.setItem('DspPatrolPrefix', 'WinterPark');
-        homeNavigator.pushPage('home/tsandcs.html');
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
-Ensure the user accepts the terms of service and privacy policy.
-*/
-module.controller('TsAndCsController', function ($scope, $http, AccessLogService) {
-    AccessLogService.log('info', 'TsAndCs');
-    $scope.accept = function () {
-        homeNavigator.pushPage('home/registration.html');
-    };
-    $scope.back = function () {
-        homeNavigator.popPage();
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
-Register the user with the server all proper and that.
-*/
-module.controller('RegistrationController', function ($rootScope, $scope, $http, AccessLogService) {
-    AccessLogService.log('info', 'Registration');
-    localStorage.removeItem('DspPassword');
-    $scope.email = localStorage.getItem('DspEmail');
-    $scope.message = 'Enter your email address (use the one from your roster if you are on a patrol). Then tap "Register." Note: Entering a fake email address will not enable you to complete registration.';
-    $scope.register = function () {
-        var name = localStorage.getItem('OnsFirstName') + ' ' + localStorage.getItem('OnsLastName'),
-            patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
-            body = {
-                email: $scope.email,
-                first_name: name,
-                last_name: patrolPrefix,
-                display_name: name + ' (' + localStorage.getItem('DspPatrolName') + ')'
-            },
-            registrationRequest = dspRequest('POST', '/user/register', body);
-        if (!$scope.email) {
-            $scope.message = 'Email address is required for registration.';
-        } else {
-            localStorage.setItem('DspEmail', $scope.email);
-            $scope.message = 'Registering...';
-            $http(registrationRequest).
-                success(function (data, status, headers, config) {
-                    AccessLogService.log('info', 'Registration');
-                    localStorage.removeItem('DspAllPatrol');
-                    localStorage.removeItem('OnsFirstName');
-                    localStorage.removeItem('OnsLastName');
-                    homeNavigator.pushPage('home/confirmation.html');
-                    waitNoMore();
-                }).
-                error(function (data, status, headers, config) {
-                    AccessLogService.log('warn', 'RegistrationErr', niceMessage(data, status));
-                    $scope.message = 'This email address or name in this patrol has already been registered. Rather than creating a new account, try logging in by clicking "Login" below.';
-                    $scope.showLogin = true;
-                    waitNoMore();
-                });
-        }
-    };
-    $scope.back = function () {
-        homeNavigator.popPage();
-    };
-    $scope.login = function () {
-        homeNavigator.resetToPage('home/login.html');
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
-Let the user know they still need to confirm their account via the email sent.
-*/
-module.controller('ConfirmationController', function ($scope, $http, AccessLogService) {
-    AccessLogService.log('info', 'Confirmation');
-    localStorage.setItem('OnsIntroDone', new Date());
-    $scope.restart = function () {
-        homeNavigator.resetToPage('home/home.html');
-    };
-    $scope.exit = function () {
-        navigator.app.exitApp();
-    };
-    ons.ready(function () {
-        return;
-    });
-});
-
-/*
 Log in the user.
 */
 module.controller('LoginController', function ($rootScope, $scope, $http, AccessLogService) {
-    var email = localStorage.getItem('DspEmail');
+    var user = localStorage.getItem('DspEmail');
     AccessLogService.log('info', 'Login');
     $rootScope.hideTabs = true;
-    if (email) {
-        $scope.email = email;
-        $scope.focusElement = "password";
-    } else {
-        $scope.focusElement = "email";
-    }
+    $scope.focusElement = "password";
     $scope.login = function () {
         var body = {
-                email: $scope.email,
+                email: user,
                 password: $scope.password,
                 duration: 31104000
             },
             sessionRequest = dspRequest('POST', '/user/session', body);
-        if (!$scope.email) {
-            $scope.message = 'Email is required. Try again.';
-        } else if (!$scope.password) {
-            localStorage.setItem('DspEmail', $scope.email);
-            $scope.message = 'Password is required. Try again.';
+        if (!$scope.password) {
+            $scope.message = 'Confirmation code is required. Try again.';
         } else {
             havePatience($rootScope);
             $http(sessionRequest).
                 success(function (data, status, headers, config) {
                     AccessLogService.log('info', 'Authenticated', data.first_name);
                     localStorage.setItem('DspUserId', data.id);
-                    localStorage.setItem('DspEmail', body.email);
                     localStorage.setItem('DspPassword', body.password);
                     localStorage.setItem('DspRole', data.role);
                     localStorage.setItem('DspName', data.first_name);
