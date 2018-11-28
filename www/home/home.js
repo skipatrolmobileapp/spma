@@ -62,7 +62,7 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
         if (!password) {
             if (!email) {
                 $rootScope.hideTabs = true;
-                homeNavigator.resetToPage('home/introv3.html', {animation: 'none'});
+                homeNavigator.resetToPage('home/intro.html', {animation: 'none'});
             } else {
                 $rootScope.hideTabs = true;
                 homeNavigator.resetToPage('home/login.html', {animation: 'none'});
@@ -120,7 +120,7 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
               error(function (data, status, headers, config) {
                   AccessLogService.log('info', 'SessionErr', data);
                   $rootScope.hideTabs = true;
-                  homeNavigator.resetToPage('home/introv3.html', {animation: 'none'});
+                  homeNavigator.resetToPage('home/intro.html', {animation: 'none'});
               });
         }
     }
@@ -133,7 +133,7 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
 /*
 Let the user register with the new, simple email-based registration scheme.
 */
-module.controller('IntroV3Controller', function ($rootScope, $scope, $http, AccessLogService) {
+module.controller('IntroController', function ($rootScope, $scope, $http, AccessLogService) {
     AccessLogService.log('info', 'Intro');
     localStorage.removeItem('DspPatrolPrefix');
     localStorage.removeItem('DspEmail');
