@@ -291,7 +291,7 @@ module.controller('LoginController', function ($rootScope, $scope, $http, Access
               });
     };
     $scope.register = function () {
-        homeNavigator.resetToPage('home/introv3.html');
+        homeNavigator.resetToPage('home/intro.html');
     };
     $scope.exit = function () {
         navigator.app.exitApp();
