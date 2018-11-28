@@ -1202,13 +1202,19 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
             if ('chancesn.png' === openSnow.location.forecast.period[i].day.icon) {
                 openSnow.location.forecast.period[i].day.icon = 'sn.png';
             }
+            if ('snow.png' === openSnow.location.forecast.period[i].day.icon) {
+                openSnow.location.forecast.period[i].day.icon = 'sn.png';
+            }
             days[i].dayIcon = 'img/nws/newicons/' + openSnow.location.forecast.period[i].day.icon;
             days[i].dayWeather = openSnow.location.forecast.period[i].day.weather;
             days[i].dayWind = 'Wind: ' + openSnow.location.forecast.period[i].day.wind_dir;
             // days[i].nightIcon = 'http://forecast.weather.gov/newimages/medium/' + openSnow.location.forecast.period[i].night.icon;
             // Hack to handle some missing icons...
-            if ('nchancesn.png' === openSnow.location.forecast.period[i].day.icon) {
-                openSnow.location.forecast.period[i].day.icon = 'nsn.png';
+            if ('nchancesn.png' === openSnow.location.forecast.period[i].night.icon) {
+                openSnow.location.forecast.period[i].night.icon = 'nsn.png';
+            }
+            if ('nsnow.png' === openSnow.location.forecast.period[i].night.icon) {
+                openSnow.location.forecast.period[i].night.icon = 'nsn.png';
             }
             days[i].nightIcon = 'img/nws/newicons/' + openSnow.location.forecast.period[i].night.icon;
             days[i].nightWeather = openSnow.location.forecast.period[i].night.weather;
