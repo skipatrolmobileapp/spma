@@ -23,6 +23,7 @@ module.controller('MoreController', function ($scope, $http, AccessLogService) {
         i;
     AccessLogService.log('info', 'More');
     $scope.enableAd = false;
+    /*
     if (('Guest' == role) && (ads) && ('Yes' === patrol.showAds)) {
         for (i = 0; i < ads.length; i += 1) {
             if ('more' === ads[i].slot) {
@@ -32,6 +33,7 @@ module.controller('MoreController', function ($scope, $http, AccessLogService) {
             }
         }
     }
+    */
     if ('Guest' === role) {
         $scope.showPatrollerStuff = false;
     } else {

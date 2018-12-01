@@ -245,6 +245,7 @@ module.controller('PatrolController', function ($scope, $http, AccessLogService)
         }
     } else {
         $scope.enableAd = false;
+        /*
         if (ads && ('Yes' === patrol.showAds)) {
             for (i = 0; i < ads.length; i += 1) {
                 if ('patrol' === ads[i].slot) {
@@ -254,6 +255,7 @@ module.controller('PatrolController', function ($scope, $http, AccessLogService)
                 }
             }
         }
+        */
         $scope.aGuest = true;
         $scope.items = angular.fromJson(localStorage.getItem('DspCall'));
         $http(callRequest).

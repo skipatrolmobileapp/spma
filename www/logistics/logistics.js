@@ -54,6 +54,7 @@ module.controller('LogisticsController', function ($rootScope, $scope, $http, Ac
         if (navigator.geolocation) {
             $scope.showLocationFinder = true;
         }
+  /*
     } else {
         if (ads && ('Yes' === patrol.showAds)) {
             for (i = 0; i < ads.length; i += 1) {
@@ -64,6 +65,7 @@ module.controller('LogisticsController', function ($rootScope, $scope, $http, Ac
                 }
             }
         }
+  */
     }
     sampling = false;
     if ('Yes' === patrol.haveQrCodes) {

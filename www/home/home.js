@@ -519,6 +519,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
                 AccessLogService.log('error', 'GetPostErr', niceMessage(data, status));
             });
     } else {
+        /*
         if (ads && ('Yes' === patrol.showAds)) {
             for (i = 0; i < ads.length; i += 1) {
                 if ('home' === ads[i].slot) {
@@ -528,6 +529,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
                 }
             }
         }
+        */
     }
     $scope.days = [];
     $scope.areas = [];
