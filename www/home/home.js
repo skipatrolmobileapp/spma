@@ -569,7 +569,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
             if ('0' !== openSnow.location.forecast.period[i].day.snow) {
                 days[n] = {};
                 if ('USA' === patrol.country) {
-                    days[n].forecast = openSnow.location.forecast.period[i].dow + ' Daytime - ' + openSnow.location.forecast.period[i].day.snow + '"';
+                    days[n].forecast = openSnow.location.forecast.period[i].dow + ' Daytime - ' + openSnow.location.forecast.period[i].day.snow;
                 } else {
                     if (openSnow.location.forecast.period[i].day.snow.indexOf('-') > 0) {
                         days[n].forecast = openSnow.location.forecast.period[i].dow + ' Daytime - ' +
@@ -585,7 +585,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
             if ('0' !== openSnow.location.forecast.period[i].night.snow) {
                 days[n] = {};
                 if ('USA' === patrol.country) {
-                    days[n].forecast = openSnow.location.forecast.period[i].dow + ' Overnight - ' + openSnow.location.forecast.period[i].night.snow + '"';
+                    days[n].forecast = openSnow.location.forecast.period[i].dow + ' Overnight - ' + openSnow.location.forecast.period[i].night.snow;
                 } else {
                     if (openSnow.location.forecast.period[i].night.snow.indexOf('-') > 0) {
                         days[n].forecast = openSnow.location.forecast.period[i].dow + ' Overnight - ' +
@@ -709,7 +709,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
                     if ('0' !== data.location.forecast.period[i].day.snow) {
                         days[n] = {};
                         if ('USA' === patrol.country) {
-                            days[n].forecast = data.location.forecast.period[i].dow + ' Daytime - ' + data.location.forecast.period[i].day.snow + '"';
+                            days[n].forecast = data.location.forecast.period[i].dow + ' Daytime - ' + data.location.forecast.period[i].day.snow;
                         } else {
                             if (data.location.forecast.period[i].day.snow.indexOf('-') > 0) {
                                 days[n].forecast = data.location.forecast.period[i].dow + ' Daytime - ' +
@@ -725,7 +725,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
                     if ('0' !== data.location.forecast.period[i].night.snow) {
                         days[n] = {};
                         if ('USA' === patrol.country) {
-                            days[n].forecast = data.location.forecast.period[i].dow + ' Overnight - ' + data.location.forecast.period[i].night.snow + '"';
+                            days[n].forecast = data.location.forecast.period[i].dow + ' Overnight - ' + data.location.forecast.period[i].night.snow;
                         } else {
                             if (data.location.forecast.period[i].night.snow.indexOf('-') > 0) {
                                 days[n].forecast = data.location.forecast.period[i].dow + ' Overnight - ' +
@@ -1220,10 +1220,10 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
             days[i].nightWeather = openSnow.location.forecast.period[i].night.weather;
             days[i].nightWind = 'Wind: ' + openSnow.location.forecast.period[i].night.wind_dir;
             if ('USA' === patrol.country) {
-                days[i].daySnow = 'Snow: ' + openSnow.location.forecast.period[i].day.snow + '"';
+                days[i].daySnow = 'Snow: ' + openSnow.location.forecast.period[i].day.snow;
                 days[i].dayTemp = openSnow.location.forecast.period[i].day.temp + ' °F';
                 days[i].dayWindSpeed = openSnow.location.forecast.period[i].day.wind_speed;
-                days[i].nightSnow = 'Snow: ' + openSnow.location.forecast.period[i].night.snow + '"';
+                days[i].nightSnow = 'Snow: ' + openSnow.location.forecast.period[i].night.snow;
                 days[i].nightTemp = openSnow.location.forecast.period[i].night.temp + ' °F';
                 days[i].nightWindSpeed = openSnow.location.forecast.period[i].night.wind_speed;
             } else {
