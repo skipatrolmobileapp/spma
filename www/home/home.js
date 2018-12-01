@@ -194,7 +194,7 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
                                     });
                             });
                     } else {
-                        $scope.message = 'Registering as guest...';
+                        $scope.message = 'App is available only to registered patrollers.';
                         // homeNav to a pick resort screen...
                     }
                     waitNoMore();
