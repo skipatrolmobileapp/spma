@@ -1,10 +1,4 @@
-/*jshint strict: true */
-/*jshint unused: false */
-/*jslint node: true */
-/*jslint indent: 4 */
-/*jslint unparam:true */
 /*global ons, module, moreNavigator, youtube, sendEmail */
-"use strict";
 
 /*
 Ski Patrol Mobile App
