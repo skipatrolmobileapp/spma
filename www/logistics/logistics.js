@@ -50,11 +50,11 @@ module.controller('LogisticsController', function ($rootScope, $scope, $http, Ac
     AccessLogService.log('info', 'Logistics');
     $scope.enableAd = false;
     $scope.showLocationFinder = false;
+    /*
     if ('Basic' === role || 'Power' === role || 'Leader' === role) {
         if (navigator.geolocation) {
             $scope.showLocationFinder = true;
         }
-  /*
     } else {
         if (ads && ('Yes' === patrol.showAds)) {
             for (i = 0; i < ads.length; i += 1) {
@@ -65,8 +65,8 @@ module.controller('LogisticsController', function ($rootScope, $scope, $http, Ac
                 }
             }
         }
-  */
     }
+    */
     sampling = false;
     if ('Yes' === patrol.haveQrCodes) {
         $scope.haveQrCodes = true;
