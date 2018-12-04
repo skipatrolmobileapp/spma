@@ -1203,8 +1203,9 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
             // Hack to handle some missing icons...
             if ('chancesn.png' === openSnow.location.forecast.period[i].day.icon) {
                 openSnow.location.forecast.period[i].day.icon = 'sn.png';
-            }
-            if ('snow.png' === openSnow.location.forecast.period[i].day.icon) {
+            } else if ('snow.png' === openSnow.location.forecast.period[i].day.icon) {
+                openSnow.location.forecast.period[i].day.icon = 'sn.png';
+            } else if ('snow_showers.png' === openSnow.location.forecast.period[i].day.icon) {
                 openSnow.location.forecast.period[i].day.icon = 'sn.png';
             }
             days[i].dayIcon = 'img/nws/newicons/' + openSnow.location.forecast.period[i].day.icon;
@@ -1214,8 +1215,9 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
             // Hack to handle some missing icons...
             if ('nchancesn.png' === openSnow.location.forecast.period[i].night.icon) {
                 openSnow.location.forecast.period[i].night.icon = 'nsn.png';
-            }
-            if ('nsnow.png' === openSnow.location.forecast.period[i].night.icon) {
+            } else if ('nsnow.png' === openSnow.location.forecast.period[i].night.icon) {
+                openSnow.location.forecast.period[i].night.icon = 'nsn.png';
+            } else if ('nsnow_showers.png' === openSnow.location.forecast.period[i].night.icon) {
                 openSnow.location.forecast.period[i].night.icon = 'nsn.png';
             }
             days[i].nightIcon = 'img/nws/newicons/' + openSnow.location.forecast.period[i].night.icon;
