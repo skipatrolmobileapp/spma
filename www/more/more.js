@@ -53,7 +53,7 @@ Let the user send me an email.
 module.controller('HelpController', function ($scope, AccessLogService) {
     AccessLogService.log('info', 'Help');
     $scope.email = function () {
-        sendEmail('skipatrolmobileapp@gmail.com', 'Ski%20Patrol%20Mobile%20App');
+        sendEmail('gary@meyer.net', 'Ski%20Patrol%20Mobile%20App');
     };
     $scope.close = function () {
         moreNavigator.popPage();

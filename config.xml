@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.skipatrolmobileapp.m" versionCode="10" version="3.0.4" ios-CFBundleVersion="3.0.4">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.skipatrolmobileapp.m" versionCode="10" version="3.0.5" ios-CFBundleVersion="3.0.5">
   <name>Ski Patrol</name>
   <description>Mobile App for Ski Patrollers</description>
   <author href="http://www.skipatrolmobileapp.com" email="skipatrolmobileapp@gmail.com">Gary Meyer</author>
