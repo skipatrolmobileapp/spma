@@ -52,11 +52,6 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
     $rootScope.logisticsTab = null;
     if (haveInitializedApp) {
         $rootScope.hideTabs = false;
-        if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-            // Don't show personal tab until fully implenented.
-            // $rootScope.showPersonalTab = true;
-            $rootScope.showPersonalTab = false;
-        }
         homeNavigator.resetToPage('home/live.html', {animation: 'none'});
     } else {
         if (!password) {
@@ -86,11 +81,6 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
                           $scope.loading = '';
                           haveInitializedApp = true;
                           $rootScope.hideTabs = false;
-                          if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-                              // Don't show personal tab until fully implemented.
-                              // $rootScope.showPersonalTab = true;
-                              $rootScope.showPersonalTab = false;
-                          }
                           homeNavigator.resetToPage('home/live.html', {animation: 'none'});
                           waitNoMore();
                           if (data.resource[0].alert) {
@@ -108,11 +98,6 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
                       error(function (data, status, headers, config) {
                           AccessLogService.log('info', 'PatrolErr', data);
                           $rootScope.hideTabs = false;
-                          if ('Basic' === role || 'Power' === role || 'Leader' === role) {
-                              // Don't show until fully implemented.
-                              // $rootScope.showPersonalTab = true;
-                              $rootScope.showPersonalTab = false;
-                          }
                           homeNavigator.resetToPage('home/live.html', {animation: 'none'});
                           waitNoMore();
                       });
