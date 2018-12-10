@@ -172,6 +172,10 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
                             });
                     } else {
                         $scope.message = 'App is available only to registered patrollers.';
+                        email = null;
+                        localStorage.removeItem('DspPatrolPrefix');
+                        localStorage.removeItem('DspEmail');
+                        localStorage.removeItem('DspPassword');
                     }
                     waitNoMore();
                 }).
