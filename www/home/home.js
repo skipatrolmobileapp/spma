@@ -20,7 +20,6 @@ Start the app. Direct the user to register, login, or just show the live home sc
 module.controller('HomeController', function ($rootScope, $scope, $http, AccessLogService) {
     var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
         role = localStorage.getItem('DspRole'),
-        adRequest = dspRequest('GET', '/team/_table/Ad', null),
         email = localStorage.getItem('DspEmail'),
         password = localStorage.getItem('DspPassword'),
         introDone = localStorage.getItem('OnsIntroDone'),
@@ -41,13 +40,6 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
         sessionRequest = dspRequest('POST', '/user/session', body),
         patrolRequest = dspRequest('GET', '/team/_table/PatrolOrg?filter=tenantId="' + patrolPrefix + '"', null);
     AccessLogService.log('info', 'Home', 'Load');
-    $http(adRequest).
-        success(function (data, status, headers, config) {
-            localStorage.setItem('DspAd', angular.toJson(data.resource));
-        }).
-        error(function (data, status, headers, config) {
-            AccessLogService.log('info', 'AdErr', data);
-        });
     $rootScope.homeTab = true;
     $rootScope.logisticsTab = null;
     if (haveInitializedApp) {
@@ -180,7 +172,6 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
                             });
                     } else {
                         $scope.message = 'App is available only to registered patrollers.';
-                        // homeNav to a pick resort screen...
                     }
                     waitNoMore();
                 }).
@@ -457,7 +448,6 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
         error(function (data, status, headers, config) {
             AccessLogService.log('error', 'GetTerritoryErr', niceMessage(data, status));
         });
-    $scope.enableAd = false;
     if ('Basic' === role || 'Power' === role || 'Leader' === role) {
         $http(settingRequest).
             success(function (data, status, headers, config) {
@@ -503,18 +493,6 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
             error(function (data, status, headers, config) {
                 AccessLogService.log('error', 'GetPostErr', niceMessage(data, status));
             });
-    } else {
-        /*
-        if (ads && ('Yes' === patrol.showAds)) {
-            for (i = 0; i < ads.length; i += 1) {
-                if ('home' === ads[i].slot) {
-                    $scope.adImageAddress = ads[i].imageAddress;
-                    $scope.adLinkAddress = ads[i].linkAddress;
-                    $scope.enableAd = true;
-                }
-            }
-        }
-        */
     }
     $scope.days = [];
     $scope.areas = [];
