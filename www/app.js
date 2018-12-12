@@ -25,9 +25,8 @@ var IN_CORDOVA = false, // Indicator if in Cordova. Assume not.
 
 /*
 Let iOS status bar fully appear.
-TODO: Perhaps there's a way to get the ons-toolbar to display smartly on the iPhone.
 */
-ons.disableAutoStatusBarFill();
+// ons.disableAutoStatusBarFill();
 
 /*
 Initialize Cordova.
@@ -385,13 +384,6 @@ function youtube(address) {
 }
 
 /*
-Open an ad.
-*/
-function openAd(address) {
-    openInExternalBrowser(address);
-}
-
-/*
 Make a nice and pretty message.
 */
 function niceMessage(data, status) {
@@ -429,49 +421,6 @@ See: http://stackoverflow.com/questions/196972/convert-string-to-title-case-with
 */
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
-
-/*
-Convert degrees bearing to such as "SW".
-*/
-function writeOutBearing(bearing) {
-    var retValue;
-    if (bearing < 11.25) {
-        retValue = 'north';
-    } else if (bearing < 33.75) {
-        retValue = 'north-northeast';
-    } else if (bearing < 56.25) {
-        retValue = 'northeast';
-    } else if (bearing < 78.75) {
-        retValue = 'east-northeast';
-    } else if (bearing < 101.25) {
-        retValue = 'east';
-    } else if (bearing < 123.75) {
-        retValue = 'east-southeast';
-    } else if (bearing < 146.25) {
-        retValue = 'southeast';
-    } else if (bearing < 168.75) {
-        retValue = 'south-southeast';
-    } else if (bearing < 191.25) {
-        retValue = 'south';
-    } else if (bearing < 213.75) {
-        retValue = 'south-southwest';
-    } else if (bearing < 236.25) {
-        retValue = 'southwest';
-    } else if (bearing < 258.75) {
-        retValue = 'west-southwest';
-    } else if (bearing < 281.25) {
-        retValue = 'west';
-    } else if (bearing < 303.75) {
-        retValue = 'west-northwest';
-    } else if (bearing < 326.25) {
-        retValue = 'northwest';
-    } else if (bearing < 348.75) {
-        retValue = 'north-northwest';
-    } else {
-        retValue = 'north';
-    }
-    return retValue;
 }
 
 /*
