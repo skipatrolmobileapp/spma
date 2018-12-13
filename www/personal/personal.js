@@ -14,11 +14,9 @@ function buildScheduleSummary(schedule) {
     var i,
         totalCredits = 0,
         summary;
-    console.debug('Building schedule summary for ' + schedule.length);
     for (i = 0; i < schedule.length; i++) {
         totalCredits = totalCredits + schedule[i].credits;
     }
-    console.debug('Built.');
     if (totalCredits == 1) {
         summary = totalCredits + ' credit day recorded';
     } else {
