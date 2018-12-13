@@ -810,6 +810,7 @@ Posts.
 */
 module.controller('PostsController', function ($rootScope, $scope, $http, AccessLogService) {
     var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
+        patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
         postRequest = dspRequest('GET', '/team/_table/Post?limit=25&order=postedOn%20desc', null),
         posts = angular.fromJson(localStorage.getItem('DspPost')),
         i = 0,
@@ -832,6 +833,22 @@ module.controller('PostsController', function ($rootScope, $scope, $http, Access
     $scope.poster = !alreadyHasPosts;
     alreadyHasPosts = false;
     postRequest.cache = false;
+    $scope.patrollers = [];
+    $scope.search = function (name) {
+        var n = 0,
+            i = 0;
+        $scope.patrollers = [];
+        name = name.toLowerCase();
+        if ((name) && (name.length > 1)) {
+            for (i = 0; i < patrollers.length; i += 1) {
+                if ((patrollers[i].name) && (patrollers[i].name.toLowerCase().indexOf(name) > -1)) {
+                    $scope.patrollers[n] = patrollers[i];
+                    n += 1;
+                }
+            }
+        }
+    };
+
     $http(postRequest).
         success(function (data, status, headers, config) {
             posts = data.resource;

@@ -33,11 +33,29 @@
         </div>
         <textarea class="textarea" ng-model="body" rows="3" style="width: 100%;" placeholder="Say it..." ng-show="{{'poster'}}"></textarea>
         <div>&nbsp;</div>
+
+<!--
+        <div class="inset copy centered" ng-show="{{'poster'}}">
+            Want to tag any patrollers?
+        </div>
+        <div ng-show="{{'poster'}}">
+            <input id="name" type="text" class="text-input" ng-model="name" ng-change="search(name)" placeholder="Name..." style="width: 100%">
+        </div>
+        <ons-list ng-show="{{'poster'}}">
+            <ons-list-item modifier="tappable" ng-repeat="patroller in patrollers" ng-click="pick($index)">
+                {{patroller.name}}
+            </ons-list-item>
+        </ons-list>
+        <div ng-show="{{'poster'}}">&nbsp;</div>
+        <div ng-show="{{'poster'}}">&nbsp;</div>
+-->
+
         <ons-button modifier="large tappable" ng-show="{{'poster'}}" ng-click="post()">
             <ons-icon icon="fa-check-circle" fixed-width="true">
             </ons-icon>
             Post It
         </ons-button>
+        <div ng-show="{{'poster'}}">&nbsp;</div>
         <div>&nbsp;</div>
         <div ng-repeat="post in posts">
             <div ng-click="showPost($index)">
