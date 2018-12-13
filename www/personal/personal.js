@@ -117,6 +117,18 @@ Work history.
 */
 module.controller('WorkHistoryController', function ($scope, $http, AccessLogService) {
     AccessLogService.log('info', 'WorkHistory', null);
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
+        i = null;
+    if (patrol.secretaryPatrollerId) {
+        for (i = 0; i < patrollers.length; i += 1) {
+            if (patrollers[i].id === patrol.secretaryPatrollerId) {
+                $scope.showSecretary = true;
+                $scope.secretaryName = patrollers[i].name;
+                $scope.secretaryEmail = patrollers[i].email;
+            }
+        }
+    }
     $scope.sendSecretaryEmail = function () {
         sendEmail($scope.secretaryEmail, 'Ski%20Patrol%20Credit%20Days');
     };
