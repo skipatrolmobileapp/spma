@@ -3,7 +3,7 @@
 /*jslint node: true */
 /*jslint indent: 4 */
 /*jslint unparam:true */
-/*global document, window, localStorage, ons, angular, module, moment, dspRequest, dial, sendEmail, niceMessage, patrolNavigator, havePatience, waitNoMore, openAd, sms, browse, encodeURIComponent */
+/*global document, window, localStorage, ons, angular, module, moment, dspRequest, dial, sendEmail, niceMessage, patrolNavigator, havePatience, waitNoMore, sms, browse, encodeURIComponent */
 "use strict";
 
 /*
@@ -160,7 +160,6 @@ Show patrol info.
 module.controller('PatrolController', function ($scope, $http, AccessLogService) {
     var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
         role = localStorage.getItem('DspRole'),
-        ads = angular.fromJson(localStorage.getItem('DspAd')),
         patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
         patrollerRequest = dspRequest('GET', '/team/_table/Patroller?order=name', null),
         categories = [],
@@ -267,10 +266,6 @@ module.controller('PatrolController', function ($scope, $http, AccessLogService)
                 AccessLogService.log('error', 'GetCallErr', niceMessage(data, status));
             });
     }
-    $scope.adClick = function () {
-        AccessLogService.log('info', 'AdClick', $scope.adLinkAddress);
-        openAd($scope.adLinkAddress);
-    };
     $scope.call = function (index) {
         dial($scope.items[index].number);
         AccessLogService.log('info', 'Call', $scope.items[index].number);
