@@ -1,9 +1,4 @@
-/*jshint strict: true */
-/*jshint unused: false */
-/*jslint node: true */
-/*jslint indent: 4 */
-/*jslint unparam:true */
-/*global IN_CORDOVA, device, localStorage, ons, angular, module, dspRequest, personalNavigator, havePatience, waitNoMore, niceMessage, sendEmail */
+/*global localStorage, ons, angular, module, dspRequest, personalNavigator, sendEmail */
 "use strict";
 
 /*
@@ -18,7 +13,7 @@ Personal patroller stuff.
 module.controller('PersonalController', function ($scope, $http, AccessLogService) {
     var email = localStorage.getItem('DspEmail'),
         patroller = angular.fromJson(localStorage.getItem('OnsMyPatroller')),
-        patrollerRequest = dspRequest('GET', '/team/_table/Patroller?filter=(email%20%3D%20' + email + ')', null);
+        patrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null);
     AccessLogService.log('info', 'Personal');
     if (patroller) {
       $scope.name = patroller.name;
@@ -28,10 +23,11 @@ module.controller('PersonalController', function ($scope, $http, AccessLogServic
     }
     $http(patrollerRequest).
         success(function (data, status, headers, config) {
-            if (1 === data.resource.length) {
-                $scope.name = data.resource[0].name;
+            console.debug(JSON.stringify(data));
+            if (1 === data.length) {
+                $scope.name = data[0].name;
                 $scope.showPatroller = true;
-                localStorage.setItem('OnsMyPatroller', angular.toJson(data.resource[0]));
+                localStorage.setItem('OnsMyPatroller', angular.toJson(data[0]));
             } else {
                 AccessLogService.log('warn', 'GetMyPatrollerWarn ' + email);
             }
@@ -55,7 +51,6 @@ module.controller('DemographicsController', function ($scope, $http, AccessLogSe
         i = null;
     AccessLogService.log('info', 'Demographics', patroller.name);
     $scope.name = patroller.name;
-    $scope.address = patroller.address;
     $scope.cellPhone = patroller.cellPhone;
     $scope.homePhone = patroller.homePhone;
     $scope.alternatePhone = patroller.alternatePhone;
