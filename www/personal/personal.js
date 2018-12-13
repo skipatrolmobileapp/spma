@@ -54,7 +54,6 @@ module.controller('MyPersonalController', function ($scope, $http, AccessLogServ
                 $scope.showPatroller = true;
                 localStorage.setItem('OnsMyPatroller', angular.toJson(data[0]));
                 scheduleRequest = dspRequest('GET', '/team/_proc/GetPatrollerWorkHistory(' + data[0].id + ')', null);
-
                 $http(scheduleRequest).
                     success(function (data, status, headers, config) {
                         $scope.scheduleSummary = buildScheduleSummary(data);
@@ -65,9 +64,6 @@ module.controller('MyPersonalController', function ($scope, $http, AccessLogServ
                         $scope.showSchedule = false;
                         AccessLogService.log('err', 'GetMyScheduleErr', data);
                     });
-
-
-
             } else {
                 AccessLogService.log('warn', 'GetMyPatrollerWarn ' + email);
             }
@@ -107,6 +103,22 @@ module.controller('DemographicsController', function ($scope, $http, AccessLogSe
     }
     $scope.sendSecretaryEmail = function () {
         sendEmail($scope.secretaryEmail, 'Ski%20Patrol%20Contact%20Info');
+    };
+    $scope.close = function () {
+        personalNavigator.popPage();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Work history.
+*/
+module.controller('WorkHistoryController', function ($scope, $http, AccessLogService) {
+    AccessLogService.log('info', 'WorkHistory', null);
+    $scope.sendSecretaryEmail = function () {
+        sendEmail($scope.secretaryEmail, 'Ski%20Patrol%20Credit%20Days');
     };
     $scope.close = function () {
         personalNavigator.popPage();
