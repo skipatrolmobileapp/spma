@@ -8,26 +8,68 @@ All rights reserved.
 */
 
 /*
+Build schedule summary.
+*/
+function buildScheduleSummary(schedule) {
+    var i,
+        totalCredits = 0,
+        summary;
+    console.debug('Building schedule summary for ' + schedule.length);
+    for (i = 0; i < schedule.length; i++) {
+        totalCredits = totalCredits + schedule[i].credits;
+    }
+    console.debug('Built.');
+    if (totalCredits == 1) {
+        summary = totalCredits + ' credit day recorded';
+    } else {
+        summary = totalCredits + ' credit days recorded';
+    }
+    return summary;
+}
+
+/*
 Personal patroller stuff.
 */
-module.controller('PersonalController', function ($scope, $http, AccessLogService) {
+module.controller('MyPersonalController', function ($scope, $http, AccessLogService) {
     var email = localStorage.getItem('DspEmail'),
         patroller = angular.fromJson(localStorage.getItem('OnsMyPatroller')),
-        patrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null);
+        schedule = angular.fromJson(localStorage.getItem('OnsMySchedule')),
+        patrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null),
+        scheduleRequest;
     AccessLogService.log('info', 'Personal');
     if (patroller) {
-      $scope.name = patroller.name;
-      $scope.showPatroller = true;
+        $scope.name = patroller.name;
+        $scope.showPatroller = true;
     } else {
-      $scope.showPatroller = false;
+        $scope.showPatroller = false;
+    }
+    if (schedule) {
+        $scope.scheduleSummary = buildScheduleSummary(schedule);
+        $scope.showSchedule = true;
+    } else {
+        $scope.showSchedule = false;
     }
     $http(patrollerRequest).
         success(function (data, status, headers, config) {
-            console.debug(JSON.stringify(data));
             if (1 === data.length) {
                 $scope.name = data[0].name;
                 $scope.showPatroller = true;
                 localStorage.setItem('OnsMyPatroller', angular.toJson(data[0]));
+                scheduleRequest = dspRequest('GET', '/team/_proc/GetPatrollerWorkHistory(' + data[0].id + ')', null);
+
+                $http(scheduleRequest).
+                    success(function (data, status, headers, config) {
+                        $scope.scheduleSummary = buildScheduleSummary(data);
+                        $scope.showSchedule = true;
+                        localStorage.setItem('OnsMySchedule', angular.toJson(data));
+                    }).
+                    error(function (data, status, headers, config) {
+                        $scope.showSchedule = false;
+                        AccessLogService.log('err', 'GetMyScheduleErr', data);
+                    });
+
+
+
             } else {
                 AccessLogService.log('warn', 'GetMyPatrollerWarn ' + email);
             }
