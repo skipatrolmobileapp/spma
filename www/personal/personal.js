@@ -17,7 +17,7 @@ function buildScheduleSummary(schedule) {
     for (i = 0; i < schedule.length; i++) {
         totalCredits = totalCredits + schedule[i].credits;
     }
-    if (totalCredits == 1) {
+    if ((totalCredits > 0) && (totalCredits <= 1)) {
         summary = totalCredits + ' credit day recorded';
     } else {
         summary = totalCredits + ' credit days recorded';
@@ -132,7 +132,53 @@ module.controller('WorkHistoryController', function ($scope, $http, AccessLogSer
     for (i = 0; i < schedules.length; i += 1) {
         schedules[i].quickTeaser = moment(schedules[i].activityDate).format('ddd, MMM D') + ' - ' + schedules[i].activity;
     }
+    localStorage.setItem('OnsMySchedule', angular.toJson(schedules));
     $scope.schedules = schedules;
+    if (patrol.secretaryPatrollerId) {
+        for (i = 0; i < patrollers.length; i += 1) {
+            if (patrollers[i].id === patrol.secretaryPatrollerId) {
+                $scope.showSecretary = true;
+                $scope.secretaryName = patrollers[i].name;
+                $scope.secretaryEmail = patrollers[i].email;
+            }
+        }
+    }
+    $scope.pickSchedule = function (index) {
+        schedules = angular.fromJson(
+            localStorage.getItem('OnsMySchedule')),
+        localStorage.setItem('OnsMyDay', 
+            angular.toJson(schedules[index]));
+        personalNavigator.pushPage('personal/workday.html');
+    };
+    $scope.sendSecretaryEmail = function () {
+        sendEmail($scope.secretaryEmail, 'Ski%20Patrol%20Credit%20Days');
+    };
+    $scope.close = function () {
+        personalNavigator.popPage();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Work day.
+*/
+module.controller('WorkDayController', function ($scope, $http, AccessLogService) {
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
+        day = angular.fromJson(localStorage.getItem('OnsMyDay')),
+        i;
+    $scope.quickTeaser = day.quickTeaser;
+    $scope.duty = day.duty;
+    $scope.equipment = day.equipment;
+    $scope.comments = day.comments;
+    $scope.credits = day.credits;
+    if ((day.credits > 0) && (day.credits <= 1)) {
+      $scope.creditsW = " credit day";
+    } else {
+      $scope.creditsW = " credit days";
+    }
     if (patrol.secretaryPatrollerId) {
         for (i = 0; i < patrollers.length; i += 1) {
             if (patrollers[i].id === patrol.secretaryPatrollerId) {
