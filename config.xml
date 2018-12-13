@@ -119,7 +119,7 @@
   <preference name="ShowSplashScreenSpinner" value="false"/>
   <access origin="*"/>
   <preference name="DisallowOverscroll" value="true"/>
-  <preference name="EnableViewportScale" value="false"/>
+  <preference name="EnableViewportScale" value="true"/>
   <preference name="WindowsStorePublisherName" value="Ski Patrol Mobile App"/>
   <preference name="WindowsStoreIdentityName" value="ce5f0902-4904-93b4-6cbf-7391be038116"/>
 </widget>
