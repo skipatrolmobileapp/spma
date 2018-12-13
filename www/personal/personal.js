@@ -18,9 +18,9 @@ function buildScheduleSummary(schedule) {
         totalCredits = totalCredits + schedule[i].credits;
     }
     if ((totalCredits > 0) && (totalCredits <= 1)) {
-        summary = totalCredits + ' credit day recorded';
+        summary = totalCredits + ' Credit Day Recorded';
     } else {
-        summary = totalCredits + ' credit days recorded';
+        summary = totalCredits + ' Credit Days Recorded';
     }
     return summary;
 }
@@ -175,9 +175,9 @@ module.controller('WorkDayController', function ($scope, $http, AccessLogService
     $scope.comments = day.comments;
     $scope.credits = day.credits;
     if ((day.credits > 0) && (day.credits <= 1)) {
-      $scope.creditsW = " credit day";
+      $scope.creditsW = " Credit Day";
     } else {
-      $scope.creditsW = " credit days";
+      $scope.creditsW = " Credit Days";
     }
     if (patrol.secretaryPatrollerId) {
         for (i = 0; i < patrollers.length; i += 1) {
