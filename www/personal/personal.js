@@ -169,15 +169,16 @@ module.controller('WorkDayController', function ($scope, $http, AccessLogService
         patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
         day = angular.fromJson(localStorage.getItem('OnsMyDay')),
         i;
-    $scope.quickTeaser = day.quickTeaser;
+    $scope.quickTeaser = moment(day.activityDate).format('ddd, MMM D');
+    $scope.activity = day.activity;
     $scope.duty = day.duty;
     $scope.equipment = day.equipment;
     $scope.comments = day.comments;
     $scope.credits = day.credits;
     if ((day.credits > 0) && (day.credits <= 1)) {
-      $scope.creditsW = " Credit Day";
+      $scope.creditsW = " Credit";
     } else {
-      $scope.creditsW = " Credit Days";
+      $scope.creditsW = " Credits";
     }
     if (patrol.secretaryPatrollerId) {
         for (i = 0; i < patrollers.length; i += 1) {

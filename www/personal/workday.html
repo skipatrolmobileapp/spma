@@ -17,13 +17,18 @@
         </div>
 
         <ons-list>
+            <ons-list-item ng-show="activity">
+                <ons-icon icon="fa-medkit" fixed-width="true">
+                </ons-icon>
+                {{activity}}
+            </ons-list-item>
             <ons-list-item ng-show="duty">
                 <ons-icon icon="fa-map-marker" fixed-width="true">
                 </ons-icon>
                 {{duty}}
             </ons-list-item>
             <ons-list-item ng-show="equipment">
-                <ons-icon icon="fa-bars" fixed-width="true">
+                <ons-icon icon="fa-signal" fixed-width="true">
                 </ons-icon>
                 {{equipment}}
             </ons-list-item>
