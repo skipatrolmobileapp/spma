@@ -8,39 +8,17 @@
                 <ons-list-item class="centered prominent">
                     <ons-icon icon="fa-calendar" fixed-width="true">
                     </ons-icon>
-                    My Work History
+                    My Credit Days
                 </ons-list-item>
             </ons-list>
         </div>
-        <!--
-        <ons-list>
-            <ons-list-item ng-show="cellPhone">
-                <ons-icon icon="fa-phone" fixed-width="true">
+        <div>
+            <ons-list-item class="navigable" modifier="chevron tappable" ng-repeat="schedule in schedules" ng-click="pickSchedule($index)">
+                <ons-icon icon="fa-calendar" fixed-width="true">
                 </ons-icon>
-                {{cellPhone}} (Cell)
+                {{schedule.quickTeaser}}
             </ons-list-item>
-            <ons-list-item ng-show="homePhone">
-                <ons-icon icon="fa-phone" fixed-width="true">
-                </ons-icon>
-                {{homePhone}} (Home)
-            </ons-list-item>
-            <ons-list-item ng-show="alternatePhone">
-                <ons-icon icon="fa-phone" fixed-width="true">
-                </ons-icon>
-                {{alternatePhone}} (Alt)
-            </ons-list-item>
-            <ons-list-item ng-show="email">
-                <ons-icon icon="fa-envelope" fixed-width="true">
-                </ons-icon>
-                {{email}}
-            </ons-list-item>
-            <ons-list-item ng-show="additionalEmail">
-                <ons-icon icon="fa-envelope" fixed-width="true">
-                </ons-icon>
-                {{additionalEmail}} (Alt)
-            </ons-list-item>
-        </ons-list>
-        -->
+        </div>
         <div>&nbsp;</div>
         <div ng-show="showSecretary">
             <div class="inset centered copy">

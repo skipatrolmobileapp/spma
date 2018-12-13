@@ -390,7 +390,7 @@ module.controller('PatrollerController', function ($scope, $http, AccessLogServi
                         + moment().format('YYYY-MM-DD') + ' and ') +
                 */
                 encodeURIComponent('patrollerId=' + patroller.id) + '&order=' +
-                encodeURIComponent('activityDate desc,activity'),
+                encodeURIComponent('activityDate,activity'),
                 null),
         schedules,
         i;

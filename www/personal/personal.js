@@ -1,4 +1,4 @@
-/*global localStorage, ons, angular, module, dspRequest, personalNavigator, sendEmail */
+/*global localStorage, ons, angular, module, dspRequest, personalNavigator, sendEmail, moment */
 "use strict";
 
 /*
@@ -30,11 +30,19 @@ Personal patroller stuff.
 */
 module.controller('MyPersonalController', function ($scope, $http, AccessLogService) {
     var email = localStorage.getItem('DspEmail'),
+        patrollerRequest = dspRequest('GET', '/team/_table/Patroller?order=name', null),
         patroller = angular.fromJson(localStorage.getItem('OnsMyPatroller')),
         schedule = angular.fromJson(localStorage.getItem('OnsMySchedule')),
         patrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null),
         scheduleRequest;
     AccessLogService.log('info', 'Personal');
+    $http(patrollerRequest).
+            success(function (data, status, headers, config) {
+                localStorage.setItem('DspPatroller', angular.toJson(patrollers));
+            }).
+            error(function (data, status, headers, config) {
+                AccessLogService.log('error', 'GetPatrollerErr', niceMessage(data, status));
+            });
     if (patroller) {
         $scope.name = patroller.name;
         $scope.showPatroller = true;
@@ -119,7 +127,12 @@ module.controller('WorkHistoryController', function ($scope, $http, AccessLogSer
     AccessLogService.log('info', 'WorkHistory', null);
     var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
         patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
+        schedules = angular.fromJson(localStorage.getItem('OnsMySchedule')),
         i = null;
+    for (i = 0; i < schedules.length; i += 1) {
+        schedules[i].quickTeaser = moment(schedules[i].activityDate).format('ddd, MMM D') + ' - ' + schedules[i].activity;
+    }
+    $scope.schedules = schedules;
     if (patrol.secretaryPatrollerId) {
         for (i = 0; i < patrollers.length; i += 1) {
             if (patrollers[i].id === patrol.secretaryPatrollerId) {
