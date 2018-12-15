@@ -430,3 +430,46 @@ From: http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-comm
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+/*
+Convert degrees bearing to such as "SW".
+*/
+function writeOutBearing(bearing) {
+    var retValue;
+    if (bearing < 11.25) {
+        retValue = 'north';
+    } else if (bearing < 33.75) {
+        retValue = 'north-northeast';
+    } else if (bearing < 56.25) {
+        retValue = 'northeast';
+    } else if (bearing < 78.75) {
+        retValue = 'east-northeast';
+    } else if (bearing < 101.25) {
+        retValue = 'east';
+    } else if (bearing < 123.75) {
+        retValue = 'east-southeast';
+    } else if (bearing < 146.25) {
+        retValue = 'southeast';
+    } else if (bearing < 168.75) {
+        retValue = 'south-southeast';
+    } else if (bearing < 191.25) {
+        retValue = 'south';
+    } else if (bearing < 213.75) {
+        retValue = 'south-southwest';
+    } else if (bearing < 236.25) {
+        retValue = 'southwest';
+    } else if (bearing < 258.75) {
+        retValue = 'west-southwest';
+    } else if (bearing < 281.25) {
+        retValue = 'west';
+    } else if (bearing < 303.75) {
+        retValue = 'west-northwest';
+    } else if (bearing < 326.25) {
+        retValue = 'northwest';
+    } else if (bearing < 348.75) {
+        retValue = 'north-northwest';
+    } else {
+        retValue = 'north';
+    }
+    return retValue;
+}
