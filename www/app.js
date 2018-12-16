@@ -312,18 +312,21 @@ Open in an in-app browser window.
 */
 function browse(address) {
     if (typeof device === 'undefined') {
-        window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+        // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+        window.open(address, '_system');
     } else {
         switch (device.platform) {
         case 'Android':
-            window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
-            // window.open(address, '_system');
+            // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            window.open(address, '_system');
             break;
         case 'iOS':
-            window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            window.open(address, '_system');
             break;
         default:
-            window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            window.open(address, '_system');
             break;
         }
     }

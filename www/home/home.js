@@ -96,8 +96,8 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
               }).
               error(function (data, status, headers, config) {
                   AccessLogService.log('info', 'SessionErr', data);
-                  $rootScope.hideTabs = true;
-                  homeNavigator.resetToPage('home/intro.html', {animation: 'none'});
+                  $rootScope.hideTabs = false;
+                  homeNavigator.resetToPage('home/live.html', {animation: 'none'});
               });
         }
     }
