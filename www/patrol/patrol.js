@@ -8,7 +8,7 @@
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2018, Gary Meyer.
+Copyright © 2014-2020, Gary Meyer.
 All rights reserved.
 */
 
