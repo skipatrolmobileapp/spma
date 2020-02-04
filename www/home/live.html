@@ -31,17 +31,15 @@
             <ons-list-header ng-show="currentWeather || openWeather">
                 Current Weather
             </ons-list-header>
-            <!--
             <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/currentweather.html')" ng-show="currentWeather">
                 <ons-icon icon="ion-thermometer" fixed-width="true">
                 </ons-icon>
-                {{currentWeather}}
+                {{currentWeather}} on the mountain
             </ons-list-item>
-            -->
             <ons-list-item class="navigable" modifier="chevron tappable" onclick="homeNavigator.pushPage('home/openweather.html')" ng-show="openWeather">
                 <ons-icon icon="ion-thermometer" fixed-width="true">
                 </ons-icon>
-                {{openWeather}}
+                {{openWeather}} in town
             </ons-list-item>
             <ons-list-header ng-hide="hideWeather">
                 Weather Forecast

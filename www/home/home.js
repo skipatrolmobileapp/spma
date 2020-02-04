@@ -512,9 +512,9 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
     if (openWeatherMap) {
         if ((openWeatherMap.main) && (openWeatherMap.main.temp)) {
             if ('USA' === patrol.country) {
-                $scope.openWeather = Math.round(openWeatherMap.main.temp) + ' °F recently reported';
+                $scope.openWeather = Math.round(openWeatherMap.main.temp) + '°F';
             } else {
-                $scope.openWeather = Math.round((openWeatherMap.main.temp - 32) * 0.5556) + ' °C recently reported';
+                $scope.openWeather = Math.round((openWeatherMap.main.temp - 32) * 0.5556) + '°C';
             }
         }
     }
@@ -528,12 +528,10 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
                 $scope.warningsTeaser = openSnow.location.watch_warnings.item[0].title;
             }
         }
-        /*
         if ((openSnow.location) && (openSnow.location.current_conditions)) {
-            $scope.currentWeather = openSnow.location.current_conditions.temp + '° recently reported';
+            $scope.currentWeather = openSnow.location.current_conditions.temp + '°F';
             $scope.openWeather = null;
         }
-        */
         for (i = 0; i < openSnow.location.forecast.period.length; i += 1) {
             if ('0' !== openSnow.location.forecast.period[i].day.snow) {
                 days[n] = {};
@@ -642,9 +640,9 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
             success(function (data, status, headers, config) {
                 if ((data.main) && (data.main.temp)) {
                     if ('USA' === patrol.country) {
-                        $scope.openWeather = Math.round(data.main.temp) + ' °F recently reported';
+                        $scope.openWeather = Math.round(data.main.temp) + '°F';
                     } else {
-                        $scope.openWeather = Math.round((data.main.temp - 32) * 0.5556) + ' °C recently reported';
+                        $scope.openWeather = Math.round((data.main.temp - 32) * 0.5556) + '°C';
                     }
                 }
                 localStorage.setItem('DspOpenWeatherMap', angular.toJson(data));
@@ -670,7 +668,7 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
                 }
                 /*
                 if ((data.location) && (data.location.current_conditions)) {
-                    $scope.currentWeather = data.location.current_conditions.temp + '° recently reported';
+                    $scope.currentWeather = data.location.current_conditions.temp + '°F';
                     $scope.openWeather = null;
                 }
                 */
@@ -1120,7 +1118,7 @@ module.controller('CurrentWeatherController', function ($scope, AccessLogService
     var openSnow = angular.fromJson(localStorage.getItem('DspOpenSnow'));
     AccessLogService.log('info', 'CurrentWeather');
     if ((openSnow) && (openSnow.location) && (openSnow.location.current_conditions)) {
-        $scope.currentTemperature = openSnow.location.current_conditions.temp + '°';
+        $scope.currentTemperature = openSnow.location.current_conditions.temp + '°F';
         $scope.windDirection = 'Wind direction: ' + openSnow.location.current_conditions.wind_dir;
         $scope.windSpeed = 'Wind speed: ' + openSnow.location.current_conditions.wind_speed;
         $scope.reportDate = 'Updated: ' + openSnow.location.current_conditions.updated_at;
@@ -1142,10 +1140,10 @@ module.controller('OpenWeatherController', function ($scope, AccessLogService) {
     AccessLogService.log('info', 'OpenWeather');
     if ((openWeatherMap) && (openWeatherMap.main) && (openWeatherMap.main.temp)) {
         if ('USA' === patrol.country) {
-            $scope.currentTemperature = Math.round(openWeatherMap.main.temp) + ' °F';
+            $scope.currentTemperature = Math.round(openWeatherMap.main.temp) + '°F';
             $scope.windSpeed = 'Wind speed: ' + Math.round(openWeatherMap.wind.speed) + ' mph';
         } else {
-            $scope.currentTemperature = Math.round((openWeatherMap.main.temp - 32) * 0.5556) + ' °C';
+            $scope.currentTemperature = Math.round((openWeatherMap.main.temp - 32) * 0.5556) + '°C';
             $scope.windSpeed = 'Wind speed: ' + Math.round(1.60934 * Number(openWeatherMap.wind.speed)) + ' km/h';
         }
         $scope.windDirection = 'Wind direction: ' + writeOutBearing(openWeatherMap.wind.deg);
@@ -1209,10 +1207,10 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
             days[i].nightWind = 'Wind: ' + openSnow.location.forecast.period[i].night.wind_dir;
             if ('USA' === patrol.country) {
                 days[i].daySnow = 'Snow: ' + openSnow.location.forecast.period[i].day.snow;
-                days[i].dayTemp = openSnow.location.forecast.period[i].day.temp + ' °F';
+                days[i].dayTemp = openSnow.location.forecast.period[i].day.temp + '°F';
                 days[i].dayWindSpeed = openSnow.location.forecast.period[i].day.wind_speed;
                 days[i].nightSnow = 'Snow: ' + openSnow.location.forecast.period[i].night.snow;
-                days[i].nightTemp = openSnow.location.forecast.period[i].night.temp + ' °F';
+                days[i].nightTemp = openSnow.location.forecast.period[i].night.temp + '°F';
                 days[i].nightWindSpeed = openSnow.location.forecast.period[i].night.wind_speed;
             } else {
                 if (openSnow.location.forecast.period[i].day.snow.indexOf('-') > 0) {
@@ -1223,7 +1221,7 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
                     days[i].daySnow = 'Snow: ' +
                         2 * Math.round(1.27 * Number(openSnow.location.forecast.period[i].day.snow)) + ' cm';
                 }
-                days[i].dayTemp = Math.round((openSnow.location.forecast.period[i].day.temp - 32) * 0.5556) + ' °C';
+                days[i].dayTemp = Math.round((openSnow.location.forecast.period[i].day.temp - 32) * 0.5556) + '°C';
                 pieces = openSnow.location.forecast.period[i].day.wind_speed.split(' ');
                 nums = pieces[pieces.length - 1].split('-');
                 if (nums.length > 1) {
@@ -1242,7 +1240,7 @@ module.controller('WeatherForecastController', function ($scope, AccessLogServic
                     days[i].nightSnow = 'Snow: ' +
                         2 * Math.round(1.27 * Number(openSnow.location.forecast.period[i].night.snow)) + ' cm';
                 }
-                days[i].nightTemp = Math.round((openSnow.location.forecast.period[i].night.temp - 32) * 0.5556) + ' °C';
+                days[i].nightTemp = Math.round((openSnow.location.forecast.period[i].night.temp - 32) * 0.5556) + '°C';
                 pieces = openSnow.location.forecast.period[i].night.wind_speed.split(' ');
                 nums = pieces[pieces.length - 1].split('-');
                 if (nums.length > 1) {
