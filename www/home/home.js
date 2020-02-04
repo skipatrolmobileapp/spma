@@ -96,8 +96,14 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
               }).
               error(function (data, status, headers, config) {
                   AccessLogService.log('info', 'SessionErr', data);
-                  $rootScope.hideTabs = false;
-                  homeNavigator.resetToPage('home/live.html', {animation: 'none'});
+                  if (data.error && data.error.code && (401 === data.error.code)) {
+                    localStorage.removeItem('DspPassword');
+                    $rootScope.hideTabs = true;
+                    homeNavigator.resetToPage('home/reconfirm.html', {animation: 'none'});
+                  } else {
+                    $rootScope.hideTabs = false;
+                    homeNavigator.resetToPage('home/live.html', {animation: 'none'});
+                  }
               });
         }
     }
@@ -113,8 +119,8 @@ Let the user register with the new, simple email-based registration scheme.
 module.controller('IntroController', function ($rootScope, $scope, $http, AccessLogService) {
     AccessLogService.log('info', 'Intro');
     localStorage.removeItem('DspPatrolPrefix');
-    localStorage.removeItem('DspEmail');
     localStorage.removeItem('DspPassword');
+    $scope.email = localStorage.getItem('DspEmail');
     $scope.focusElement = "email";
     $scope.setup = function () {
         var email = $scope.email,
