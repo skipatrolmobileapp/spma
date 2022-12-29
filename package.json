@@ -7,7 +7,6 @@
             "cordova-plugin-splashscreen": {},
             "cordova-plugin-device": {},
             "cordova-plugin-inappbrowser": {},
-            "cordova-plugin-geolocation": {},
             "cordova-plugin-statusbar": {}
         }
     },
@@ -17,7 +16,6 @@
         "cordova-plugin-splashscreen": "6.0.0",
         "cordova-plugin-device": "2.1.0",
         "cordova-plugin-inappbrowser": "5.0.0",
-        "cordova-plugin-geolocation": "4.1.0",
         "cordova-plugin-statusbar": "2.4.3"
     },
     "scripts": {

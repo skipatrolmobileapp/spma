@@ -6,7 +6,7 @@
             </div>
             <ons-list>
                 <ons-list-header ng-show="{{'enableSignIn'}}">
-                    Calendar
+                    Calendar / Past Attendance
                 </ons-list-header>
                 <ons-list-item ng-show="{{'enableSignIn'}}" class="navigable" modifier="chevron tappable" onclick="patrolNavigator.pushPage('patrol/calendar.html')">
                     <ons-icon icon="fa-calendar" fixed-width="true">
@@ -16,7 +16,7 @@
                 <ons-list-item ng-show="{{'enableSignIn'}}" class="navigable" modifier="chevron tappable" onclick="patrolNavigator.pushPage('patrol/sheets.html')">
                     <ons-icon icon="fa-calendar" fixed-width="true">
                     </ons-icon>
-                    Manage Attendance
+                    Manage Past Attendance
                 </ons-list-item>
                 <ons-list-header ng-show="events.length>0">
                     Upcoming Schedule
