@@ -8,7 +8,7 @@
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2018, Gary Meyer.
+Copyright © 2014-2022, Gary Meyer.
 All rights reserved.
 */
 
@@ -274,10 +274,10 @@ function sms(number) {
             });
             break;
         case 'iOS':
-            window.open('sms:' + strippedNumber, '_system');
+            cordova.InAppBrowser.open('sms:' + strippedNumber, '_system');
             break;
         default:
-            window.open('sms:' + strippedNumber, '_system');
+            cordova.InAppBrowser.open('sms:' + strippedNumber, '_system');
             break;
         }
     }
@@ -298,10 +298,10 @@ function dial(number) {
             });
             break;
         case 'iOS':
-            window.open('tel:' + strippedNumber, '_system');
+            cordova.InAppBrowser.open('tel:' + strippedNumber, '_system');
             break;
         default:
-            window.open('tel:' + strippedNumber, '_system');
+            cordova.InAppBrowser.open('tel:' + strippedNumber, '_system');
             break;
         }
     }
@@ -312,21 +312,21 @@ Open in an in-app browser window.
 */
 function browse(address) {
     if (typeof device === 'undefined') {
-        // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
-        window.open(address, '_system');
+        // cordova.InAppBrowser.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+        cordova.InAppBrowser.open(address, '_system');
     } else {
         switch (device.platform) {
         case 'Android':
-            // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
-            window.open(address, '_system');
+            // cordova.InAppBrowser.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            cordova.InAppBrowser.open(address, '_system');
             break;
         case 'iOS':
-            // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
-            window.open(address, '_system');
+            // cordova.InAppBrowser.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            cordova.InAppBrowser.open(address, '_system');
             break;
         default:
-            // window.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
-            window.open(address, '_system');
+            // cordova.InAppBrowser.open(address, '_blank', 'location=no, titlebar=yes, menubar=no, toolbar=no, status=no, scrollbars=yes');
+            cordova.InAppBrowser.open(address, '_system');
             break;
         }
     }
@@ -338,7 +338,7 @@ Email somebody.
 function sendEmail(address, subject) {
     var url = 'mailto:' + address + '?subject=' + subject;
     if (typeof device === 'undefined') {
-        window.open(url, '_system');
+        cordova.InAppBrowser.open(url, '_system');
     } else {
         switch (device.platform) {
         case 'Android':
@@ -347,10 +347,10 @@ function sendEmail(address, subject) {
             });
             break;
         case 'iOS':
-            window.open(url, '_system');
+            cordova.InAppBrowser.open(url, '_system');
             break;
         default:
-            window.open(url, '_system');
+            cordova.InAppBrowser.open(url, '_system');
             break;
         }
     }
@@ -361,7 +361,7 @@ Open URL in a external browser.
 */
 function openInExternalBrowser(address) {
     if (typeof device === 'undefined') {
-        window.open(address, '_system');
+        cordova.InAppBrowser.open(address, '_system');
     } else {
         switch (device.platform) {
         case 'Android':
@@ -370,20 +370,13 @@ function openInExternalBrowser(address) {
             });
             break;
         case 'iOS':
-            window.open(address, '_system');
+            cordova.InAppBrowser.open(address, '_system');
             break;
         default:
-            window.open(address, '_system');
+            cordova.InAppBrowser.open(address, '_system');
             break;
         }
     }
-}
-
-/*
-Open a Youtube video.
-*/
-function youtube(address) {
-    openInExternalBrowser(address);
 }
 
 /*

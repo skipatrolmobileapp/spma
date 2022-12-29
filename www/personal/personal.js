@@ -3,46 +3,29 @@
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2018, Gary Meyer.
+Copyright © 2014-2022, Gary Meyer.
 All rights reserved.
 */
-
-/*
-Build schedule summary.
-*/
-function buildScheduleSummary(schedule) {
-    var i,
-        totalCredits = 0,
-        summary;
-    for (i = 0; i < schedule.length; i++) {
-        totalCredits = totalCredits + schedule[i].credits;
-    }
-    if ((totalCredits > 0) && (totalCredits <= 1)) {
-        summary = totalCredits + ' Credit Day Recorded';
-    } else {
-        summary = totalCredits + ' Credit Days Recorded';
-    }
-    return summary;
-}
 
 /*
 Personal patroller stuff.
 */
 module.controller('MyPersonalController', function ($scope, $http, AccessLogService) {
-    var email = localStorage.getItem('DspEmail'),
-        patrollerRequest = dspRequest('GET', '/team/_table/Patroller?order=name', null),
+    var patrolPrefix = localStorage.getItem('DspPatrolPrefix'),
+        activity = 'Credit Day',
+        today = moment().format('YYYY-MM-DD'),
+        isActivityDayRequest = dspRequest('GET',
+            '/team/_proc/IsActivityDay(' + patrolPrefix + ',' +
+            activity + ',' + today + ')', null),
+        patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        email = localStorage.getItem('DspEmail'),
         patroller = angular.fromJson(localStorage.getItem('OnsMyPatroller')),
         schedule = angular.fromJson(localStorage.getItem('OnsMySchedule')),
-        patrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null),
+        patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
+        patrollersRequest = dspRequest('GET', '/team/_table/Patroller?order=name', null),
+        patrollerRequest = dspRequest('GET',  '/team/_proc/GetPatroller(' + email + ')', null),
         scheduleRequest;
     AccessLogService.log('info', 'Personal');
-    $http(patrollerRequest).
-            success(function (data, status, headers, config) {
-                localStorage.setItem('DspPatroller', angular.toJson(patrollers));
-            }).
-            error(function (data, status, headers, config) {
-                AccessLogService.log('error', 'GetPatrollerErr', niceMessage(data, status));
-            });
     if (patroller) {
         $scope.name = patroller.name;
         $scope.showPatroller = true;
@@ -50,11 +33,18 @@ module.controller('MyPersonalController', function ($scope, $http, AccessLogServ
         $scope.showPatroller = false;
     }
     if (schedule) {
-        $scope.scheduleSummary = buildScheduleSummary(schedule);
         $scope.showSchedule = true;
     } else {
         $scope.showSchedule = false;
     }
+    $http(patrollersRequest).
+            success(function (data, status, headers, config) {
+                patrollers = data.resource;
+                localStorage.setItem('DspPatroller', angular.toJson(patrollers));
+            }).
+            error(function (data, status, headers, config) {
+                AccessLogService.log('error', 'GetPatrollerErr', niceMessage(data, status));
+            });
     $http(patrollerRequest).
         success(function (data, status, headers, config) {
             if (1 === data.length) {
@@ -64,7 +54,6 @@ module.controller('MyPersonalController', function ($scope, $http, AccessLogServ
                 scheduleRequest = dspRequest('GET', '/team/_proc/GetPatrollerWorkHistory(' + data[0].id + ')', null);
                 $http(scheduleRequest).
                     success(function (data, status, headers, config) {
-                        $scope.scheduleSummary = buildScheduleSummary(data);
                         $scope.showSchedule = true;
                         localStorage.setItem('OnsMySchedule', angular.toJson(data));
                     }).
@@ -175,11 +164,6 @@ module.controller('WorkDayController', function ($scope, $http, AccessLogService
     $scope.equipment = day.equipment;
     $scope.comments = day.comments;
     $scope.credits = day.credits;
-    if ((day.credits > 0) && (day.credits <= 1)) {
-      $scope.creditsW = " Credit";
-    } else {
-      $scope.creditsW = " Credits";
-    }
     if (patrol.secretaryPatrollerId) {
         for (i = 0; i < patrollers.length; i += 1) {
             if (patrollers[i].id === patrol.secretaryPatrollerId) {
@@ -190,7 +174,145 @@ module.controller('WorkDayController', function ($scope, $http, AccessLogService
         }
     }
     $scope.sendSecretaryEmail = function () {
-        sendEmail($scope.secretaryEmail, 'Ski%20Patrol%20Credit%20Days');
+        sendEmail($scope.secretaryEmail, 'Ski%20Patrol%20Attendance');
+    };
+    $scope.close = function () {
+        personalNavigator.popPage();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Patroller directory.
+*/
+module.controller('DirectoryController', function ($scope, AccessLogService) {
+    var patrollers = angular.fromJson(localStorage.getItem('DspPatroller'));
+    AccessLogService.log('info', 'Directory');
+    $scope.patrollers = patrollers;
+    $scope.view = function (index) {
+        localStorage.setItem('OnsPatroller', angular.toJson($scope.patrollers[index]));
+        personalNavigator.pushPage('personal/patroller.html');
+    };
+    $scope.close = function () {
+        personalNavigator.popPage();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Search for a patroller.
+*/
+module.controller('SearchController', function ($scope, AccessLogService) {
+    var patrollers = angular.fromJson(localStorage.getItem('DspPatroller'));
+    AccessLogService.log('info', 'Search');
+    $scope.patrollers = [];
+    document.getElementById("name").focus();
+    $scope.search = function (name) {
+        var n = 0,
+            i = 0;
+        $scope.patrollers = [];
+        name = name.toLowerCase();
+        if ((name) && (name.length > 1)) {
+            for (i = 0; i < patrollers.length; i += 1) {
+                if ((patrollers[i].name) && (patrollers[i].name.toLowerCase().indexOf(name) > -1)) {
+                    $scope.patrollers[n] = patrollers[i];
+                    n += 1;
+                }
+            }
+        }
+    };
+    $scope.view = function (index) {
+        localStorage.setItem('OnsPatroller', angular.toJson($scope.patrollers[index]));
+        personalNavigator.pushPage('personal/patroller.html');
+    };
+    $scope.close = function () {
+        personalNavigator.popPage();
+    };
+    ons.ready(function () {
+        return;
+    });
+});
+
+/*
+Show patroller details.
+*/
+module.controller('PatrollerController', function ($scope, $http, AccessLogService) {
+    var patrol = angular.fromJson(localStorage.getItem('DspPatrol')),
+        patroller = angular.fromJson(localStorage.getItem('OnsPatroller')),
+        patrollers = angular.fromJson(localStorage.getItem('DspPatroller')),
+        scheduleRequest = dspRequest('GET', '/team/_table/Schedule?filter=' +
+                /*
+                encodeURIComponent('activityDate <= '
+                        + moment().format('YYYY-MM-DD') + ' and ') +
+                */
+                encodeURIComponent('patrollerId=' + patroller.id) + '&order=' +
+                encodeURIComponent('activityDate,activity'),
+                null),
+        schedules,
+        i;
+    AccessLogService.log('info', 'Patroller', patroller.name);
+    $scope.name = patroller.name;
+    $scope.cellPhone = patroller.cellPhone;
+    $scope.homePhone = patroller.homePhone;
+    $scope.alternatePhone = patroller.alternatePhone;
+    $scope.email = patroller.email;
+    $scope.additionalEmail = patroller.additionalEmail;
+    scheduleRequest.cache = false;
+
+    console.debug(JSON.stringify(scheduleRequest.headers));
+    console.debug(scheduleRequest.url);
+
+    $http(scheduleRequest).
+        success(function (data, status, headers, config) {
+            schedules = data.resource;
+            for (i = 0; i < schedules.length; i += 1) {
+                schedules[i].displayDate = moment(schedules[i].activityDate).format('MMM D, YYYY');
+                if ((schedules[i].duty.indexOf('OEC') > 0) || (schedules[i].duty.indexOf('CPR') > 0) || (schedules[i].duty.indexOf('Refresher') > 0)  || (schedules[i].duty.indexOf('Course') > 0) || (schedules[i].duty.indexOf('Training') > 0) || (schedules[i].duty.indexOf('Test') > 0) || (schedules[i].duty.indexOf('NSP') > 0)) {
+                    schedules[i].summary = schedules[i].duty;
+                } else {
+                    schedules[i].summary = schedules[i].activity;
+                }
+            }
+            $scope.showSchedule = true;
+            $scope.schedules = schedules;
+            if ((schedules) && (patrol.secretaryPatrollerId)) {
+                for (i = 0; i < patrollers.length; i += 1) {
+                    if (patrollers[i].id === patrol.secretaryPatrollerId) {
+                        $scope.showSecretary = true;
+                        $scope.secretaryName = patrollers[i].name;
+                        $scope.secretaryEmail = patrollers[i].email;
+                    }
+                }
+            }            
+        }).
+        error(function (data, status, headers, config) {
+            $scope.message = niceMessage(data, status);
+            AccessLogService.log('error', 'GetScheduleErr', niceMessage(data, status));
+        });
+    $scope.textCellPhone = function () {
+        sms($scope.cellPhone);
+    };
+    $scope.callCellPhone = function () {
+        dial($scope.cellPhone);
+    };
+    $scope.callHomePhone = function () {
+        dial($scope.homePhone);
+    };
+    $scope.callAlternatePhone = function () {
+        dial($scope.alternatePhone);
+    };
+    $scope.sendEmail = function () {
+        sendEmail($scope.email, 'Ski%20Patrol');
+    };
+    $scope.sendAdditionalEmail = function () {
+        sendEmail($scope.additionalEmail, 'Ski%20Patrol');
+    };
+    $scope.sendSecretaryEmail = function () {
+        sendEmail($scope.secretaryEmail, 'Ski%20Patrol');
     };
     $scope.close = function () {
         personalNavigator.popPage();

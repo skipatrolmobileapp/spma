@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.skipatrolmobileapp.m" versionCode="10" version="3.1.3" ios-CFBundleVersion="3.1.3">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.skipatrolmobileapp.m" versionCode="10" version="4.0.0" ios-CFBundleVersion="4.0.0">
   <name>Ski Patrol</name>
   <description>Mobile App for Ski Patrollers</description>
   <author href="http://www.skipatrolmobileapp.com" email="skipatrolmobileapp@gmail.com">Gary Meyer</author>
@@ -15,7 +15,6 @@
   <preference name="AllowInlineMediaPlayback" value="false"/>
   <preference name="BackupWebStorage" value="cloud"/>
   <preference name="KeyboardDisplayRequiresUserAction" value="true"/>
-  <preference name="MediaPlaybackRequiresUserAction" value="false"/>
   <preference name="SuppressesIncrementalRendering" value="false"/>
   <preference name="TopActivityIndicator" value="gray"/>
   <preference name="GapBetweenPages" value="0"/>
@@ -61,6 +60,9 @@
     <icon src="/res/ios/icon/icon-small@2x.png" width="58" height="58"/>
     <icon src="/res/ios/icon/icon-small@3x.png" width="87" height="87"/>
     <icon src="/res/ios/icon/icon-1024.png" width="1024" height="1024"/>
+    <preference name="scheme" value="monaca-app"/>
+    <preference name="hostname" value="localhost"/>
+    <icon src="/res/ios/icon/icon-20.png" width="20" height="20"/>
     <splash src="/res/ios/screen/Default@2x~universal~anyany.png"/>
   </platform>
   <platform name="android">
@@ -70,22 +72,14 @@
     <icon src="/res/android/icon/xhdpi.png" density="xhdpi"/>
     <icon src="/res/android/icon/xxhdpi.png" density="xxhdpi"/>
     <icon src="/res/android/icon/xxxhdpi.png" density="xxxhdpi"/>
+    <preference name="AndroidWindowSplashScreenBackground" value="#468fff"/>
     <splash src="/res/android/screen/splash-port-ldpi.png" density="port-ldpi"/>
     <splash src="/res/android/screen/splash-port-mdpi.png" density="port-mdpi"/>
     <splash src="/res/android/screen/splash-port-hdpi.png" density="port-hdpi"/>
     <splash src="/res/android/screen/splash-port-xhdpi.png" density="port-xhdpi"/>
     <splash src="/res/android/screen/splash-port-xxhdpi.png" density="port-xxhdpi"/>
     <splash src="/res/android/screen/splash-port-xxxhdpi.png" density="port-xxxhdpi"/>
-  </platform>
-  <platform name="windows">
-    <icon src="/res/winrt/icon/app_logo_winrt.png" target="Square150x150Logo"/>
-    <icon src="/res/winrt/icon/package_logo_winrt.png" target="StoreLogo"/>
-    <icon src="/res/winrt/icon/app_small_logo_winrt.png" target="Square30x30Logo"/>
-    <splash src="/res/winrt/screen/app_splash_screen_winrt.png" width="620" height="300"/>
-    <icon src="/res/winrt/icon/app_tile_wide_logo_winrt.png" target="Wide315x150Logo"/>
-  </platform>
-  <platform name="chrome">
-    <icon src="/platforms/chrome/icon.png" width="128" height="128"/>
+    <splash src="/res/android/screen/splash-mdpi.png" density="mdpi"/>
   </platform>
   <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
     <string>need camera access to take pictures</string>
@@ -99,18 +93,26 @@
   <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
     <string>need to photo library access to save pictures there</string>
   </edit-config>
-  <preference name="KeepRunning" value="true"/>
-  <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
-  <preference name="Orientation" value="default"/>
-  <preference name="SplashScreenDelay" value="2000"/>
-  <preference name="Fullscreen" value="false"/>
-  <preference name="ios-XCBuildConfiguration-TARGETED_DEVICE_FAMILY" value="1,2"/>
+  <platform name="electron">
+    <icon src="/res/electron/icon/icon_electron_512.png" width="512" height="512"/>
+    <preference name="SplashScreenWidth" value="620"/>
+    <preference name="SplashScreenHeight" value="300"/>
+    <preference name="ShowSplashScreen" value="false"/>
+    <splash src="/res/electron/screen/electron_splash_image.png" width="620" height="300"/>
+  </platform>
+  <preference name="MediaTypesRequiringUserActionForPlayback" value="none"/>
+  <preference name="target-device" value="universal"/>
   <preference name="AutoHideSplashScreen" value="true"/>
   <preference name="FadeSplashScreen" value="true"/>
   <preference name="ShowSplashScreenSpinner" value="false"/>
-  <access origin="*"/>
-  <preference name="DisallowOverscroll" value="true"/>
   <preference name="EnableViewportScale" value="true"/>
+  <access origin="*"/>
+  <preference name="KeepRunning" value="true"/>
+  <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
+  <preference name="DisallowOverscroll" value="true"/>
+  <preference name="Orientation" value="default"/>
+  <preference name="SplashScreenDelay" value="2000"/>
+  <preference name="Fullscreen" value="false"/>
   <preference name="WindowsStorePublisherName" value="Ski Patrol Mobile App"/>
   <preference name="WindowsStoreIdentityName" value="ce5f0902-4904-93b4-6cbf-7391be038116"/>
 </widget>

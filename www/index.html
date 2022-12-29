@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <!-- Ski Patrol Mobile App -->
-<!-- Copyright © 2014-2018, Gary Meyer. -->
+<!-- Copyright © 2014-2022, Gary Meyer. -->
 <!-- All rights reserved. -->
 
 <head>
@@ -24,8 +24,7 @@
     <script>
         var settingAppName = 'the Ski Patrol Mobile App',
             settingTease = true,
-            settingSnowConditionsImage = 'img/blackmountain.png',
-            settingLoggingAppId = 'SPMA313';
+            settingLoggingAppId = 'SPMA400';
     </script>
     <!-- NOTE ALSO ICON AND SPLASH SCREEN IMAGE REFERENCES IN CONFIG.XML -->
     <!-- END BRANDING -->
@@ -40,13 +39,9 @@
     </script>
     <script src="home/home.js">
     </script>
-    <script src="logistics/latlong.js">
-    </script>
-    <script src="logistics/logistics.js">
+    <script src="patrol/patrol.js">
     </script>
     <script src="personal/personal.js">
-    </script>
-    <script src="patrol/patrol.js">
     </script>
     <script src="more/more.js">
     </script>
@@ -75,11 +70,9 @@
     <ons-tabbar hide-tabs="{{$root.hideTabs}}">
         <ons-tab icon="fa-home" page="home/homenav.html" active="true">
         </ons-tab>
-        <ons-tab icon="ion-images" page="logistics/logisticsnav.html">
+        <ons-tab icon="ion-ios-calendar" page="patrol/patrolnav.html">
         </ons-tab>
-        <ons-tab icon="ion-ios-people" page="patrol/patrolnav.html">
-        </ons-tab>
-        <ons-tab ng-show="{{'true'}}" icon="ion-ios-person" page="personal/personalnav.html">
+        <ons-tab icon="ion-ios-people" page="personal/personalnav.html">
         </ons-tab>
         <ons-tab icon="fa-ellipsis-h" page="more/morenav.html">
         </ons-tab>

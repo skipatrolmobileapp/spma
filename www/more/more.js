@@ -1,8 +1,8 @@
-/*global ons, module, moreNavigator, youtube, sendEmail */
+/*global window, ons, localStorage, module, moreNavigator, sendEmail */
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2018, Gary Meyer.
+Copyright © 2014-2022, Gary Meyer.
 All rights reserved.
 */
 
@@ -30,15 +30,12 @@ module.controller('ContentController', function ($scope, AccessLogService) {
 });
 
 /*
-Knots.
+Let the user send me an email.
 */
-module.controller('KnotsController', function ($scope, AccessLogService) {
-    AccessLogService.log('info', 'Knots');
-    $scope.close = function () {
-        moreNavigator.popPage();
-    };
-    $scope.youtube = function (address) {
-        youtube(address);
+module.controller('HelpController', function ($scope, AccessLogService) {
+    AccessLogService.log('info', 'Help');
+    $scope.email = function () {
+        sendEmail('gary@meyer.net', 'Ski%20Patrol%20Mobile%20App');
     };
     $scope.close = function () {
         moreNavigator.popPage();
@@ -48,12 +45,16 @@ module.controller('KnotsController', function ($scope, AccessLogService) {
     });
 });
 /*
-Let the user send me an email.
+Log Out/Reset.
 */
-module.controller('HelpController', function ($scope, AccessLogService) {
-    AccessLogService.log('info', 'Help');
-    $scope.email = function () {
-        sendEmail('gary@meyer.net', 'Ski%20Patrol%20Mobile%20App');
+module.controller('LogoutController', function ($scope, AccessLogService) {
+    AccessLogService.log('info', 'Logout');
+    $scope.logout = function () {
+        var myEmail = localStorage.getItem('DspEmail');
+        AccessLogService.log('info', 'LoggedOut');
+        localStorage.clear();
+        window.location = 'index.html';
+
     };
     $scope.close = function () {
         moreNavigator.popPage();

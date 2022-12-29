@@ -1,6 +1,6 @@
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2018, Gary Meyer.
+Copyright © 2014-2022, Gary Meyer.
 All rights reserved.
 */
 .toolbar {
@@ -102,3 +102,13 @@ select {
     background-color: #ec1f27;
 }
 */
+
+.text-input {
+    height: 40px;
+    font-size: 32px;
+}
+
+.textarea {
+    height: 40px;
+    font-size: 32px;
+}

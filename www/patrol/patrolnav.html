@@ -4,55 +4,7 @@
             <div class="inset">
                 &nbsp;
             </div>
-            <div ng-show="{{'aGuest'}}">
-                <!--
-                <ons-list>
-                    <ons-list-item class="centered">
-                        <ons-icon icon="fa-phone" fixed-width="true">
-                        </ons-icon>
-                        Patrol
-                    </ons-list-item>
-                </ons-list>
-                -->
-                <img alt="Ad Not Available" width="100%" ng-src="{{adImageAddress}}" ng-show="{{'enableAd'}}" ng-click="adClick()">
-                <ons-list>
-                    <ons-list-header>
-                        Key Phone Numbers
-                    </ons-list-header>
-                    <ons-list-item class="navigable" modifier="tappable" ng-repeat="item in items" ng-click="call($index)">
-                        <ons-icon icon="fa-phone" fixed-width="true">
-                        </ons-icon>
-                        {{item.publicName}}
-                    </ons-list-item>
-                </ons-list>
-            </div>
-            <ons-list ng-show="{{'enablePatrolInfo'}}">
-                <ons-list-header>
-                    Patrol
-                </ons-list-header>
-                <ons-list-item class="navigable" modifier="chevron tappable" onclick="patrolNavigator.pushPage('patrol/call.html')">
-                    <ons-icon icon="fa-phone" fixed-width="true">
-                    </ons-icon>
-                    Key Phone Numbers
-                </ons-list-item>
-                <ons-list-item class="navigable" modifier="chevron tappable" onclick="patrolNavigator.pushPage('patrol/directory.html')">
-                    <ons-icon icon="ion-ios-people" fixed-width="true">
-                    </ons-icon>
-                    Directory
-                </ons-list-item>
-                <ons-list-item class="navigable" modifier="chevron tappable" onclick="patrolNavigator.pushPage('patrol/search.html')">
-                    <ons-icon icon="fa-search" fixed-width="true">
-                    </ons-icon>
-                    Directory Search
-                </ons-list-item>
-                <ons-list-header ng-show="categories.length">
-                    Reference
-                </ons-list-header>
-                <ons-list-item class="navigable" modifier="chevron tappable" ng-repeat="category in categories" ng-click="viewCategory($index)" ng-show="categories">
-                    <ons-icon icon="fa-file-o" fixed-width="true">
-                    </ons-icon>
-                    {{category.category}}
-                </ons-list-item>
+            <ons-list>
                 <ons-list-header ng-show="{{'enableSignIn'}}">
                     Calendar
                 </ons-list-header>
@@ -64,7 +16,7 @@
                 <ons-list-item ng-show="{{'enableSignIn'}}" class="navigable" modifier="chevron tappable" onclick="patrolNavigator.pushPage('patrol/sheets.html')">
                     <ons-icon icon="fa-calendar" fixed-width="true">
                     </ons-icon>
-                    Attendance
+                    Manage Attendance
                 </ons-list-item>
                 <ons-list-header ng-show="events.length>0">
                     Upcoming Schedule
@@ -76,42 +28,7 @@
                     </ons-icon>
                     {{event.quickTeaser}}
                 </ons-list-item>
-                <ons-list-header ng-show="{{enableNspOnline}}">
-                    My Schedule
-                </ons-list-header>
-                <ons-list-item ng-show="{{enableNspLink}}" class="navigable" modifier="chevron tappable" ng-click="welcomeNspOnline()">
-                    <ons-icon icon="fa-link" fixed-width="true">
-                    </ons-icon>
-                    Link your NSP Online account
-                </ons-list-item>
-                <ons-list-item class="navigable" modifier="chevron tappable" ng-repeat="day in days" ng-click="showDay($index)">
-                    <ons-icon icon="fa-calendar" fixed-width="true">
-                    </ons-icon>
-                    {{day.quickTeaser}}
-                </ons-list-item>
             </ons-list>
-        </div>
-        <div class="inset" ng-hide="{{'enablePatrolInfo'}}">
-            <div class="centered">When reporting an incident, use "SAILS."</div>
-            <div class="inset">
-                <table class="inset">
-                    <tr>
-                        <td>Sex</td>
-                    </tr>
-                    <tr>
-                        <td>Age</td>
-                    </tr>
-                    <tr>
-                        <td>Injury or Illness</td>
-                    </tr>
-                    <tr>
-                        <td>Location</td>
-                    </tr>
-                    <tr>
-                        <td>Skier or Snowboarder</td>
-                    </tr>
-                </table>
-            </div>
         </div>
     </ons-page>
 </ons-navigator>

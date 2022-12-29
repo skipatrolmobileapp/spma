@@ -6,21 +6,28 @@
             </div>
             <ons-list>
                 <ons-list-header ng-show="{{'showPatroller'}}">
-                    My Contact Info
+                    My Info
                 </ons-list-header>
                 <ons-list-item ng-show="{{'showPatroller'}}" class="navigable" modifier="chevron tappable" onclick="personalNavigator.pushPage('personal/demographics.html')">
                     <ons-icon icon="fa-user" fixed-width="true"></ons-icon> {{name}}
                 </ons-list-item>
-                <ons-list-header ng-show="{{'showSchedule'}}">
-                    My Credit Days
-                </ons-list-header>
                 <ons-list-item ng-show="{{'showSchedule'}}" class="navigable" modifier="chevron tappable" onclick="personalNavigator.pushPage('personal/workhistory.html')">
-                    <ons-icon icon="fa-calendar" fixed-width="true"></ons-icon> {{scheduleSummary}}
+                    <ons-icon icon="fa-calendar" fixed-width="true"></ons-icon> My Attendance
+                </ons-list-item>
+                <ons-list-header>
+                    Patrol
+                </ons-list-header>
+                <ons-list-item class="navigable" modifier="chevron tappable" onclick="personalNavigator.pushPage('personal/directory.html')">
+                    <ons-icon icon="ion-ios-people" fixed-width="true">
+                    </ons-icon>
+                    Directory
+                </ons-list-item>
+                <ons-list-item class="navigable" modifier="chevron tappable" onclick="personalNavigator.pushPage('personal/search.html')">
+                    <ons-icon icon="fa-search" fixed-width="true">
+                    </ons-icon>
+                    Directory Search
                 </ons-list-item>
             </ons-list>
-        </div>
-        <div class="inset">
-            &nbsp
         </div>
     </ons-page>
 </ons-navigator>

@@ -1,0 +1,31 @@
+<ons-page ng-controller="LogoutController" modifier="full_bg">
+    <div class="inset">
+        &nbsp;
+    </div>
+    <div class="inset" ng-swipe-right="close()">
+        <div>
+            <ons-list>
+                <ons-list-item class="centered">
+                    <ons-icon icon="fa-sign-out" fixed-width="true">
+                    </ons-icon>
+                    Log Out
+                </ons-list-item>
+            </ons-list>
+        </div>
+        <div>
+            &nbsp;
+        </div>
+        <div class="inset copy">
+            If you're having issues with the app, consider logging out
+            and setting up again.
+        </div>
+        <div>
+            &nbsp;
+        </div>
+        <ons-button modifier="large tappable" ng-click="logout()">
+            <ons-icon icon="fa-sign-out" fixed-width="true">
+            </ons-icon>
+            Log out
+        </ons-button>
+    </div>
+</ons-page>

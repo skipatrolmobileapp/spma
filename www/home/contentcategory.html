@@ -1,0 +1,22 @@
+<ons-page ng-controller="ContentCategoryController" modifier="full_bg">
+    <div class="inset" ng-swipe-right="close()">
+        <div class="inset">
+            &nbsp;
+        </div>
+        <div>
+            <ons-list>
+                <ons-list-item class="centered">
+                    <ons-icon icon="fa-folder" fixed-width="true">
+                    </ons-icon>
+                    {{category}}
+                </ons-list-item>
+            </ons-list>
+        </div>
+        <br/>
+        <ons-list-item class="navigable" modifier="chevron tappable" ng-repeat="content in contents" ng-click="viewContent($index)" ng-show="contents">
+            <ons-icon icon="{{content.icon}}" fixed-width="true">
+            </ons-icon>
+            {{content.title}}
+        </ons-list-item>
+    </div>
+</ons-page>
