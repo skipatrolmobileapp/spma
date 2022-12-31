@@ -50,11 +50,9 @@ Log Out/Reset.
 module.controller('LogoutController', function ($scope, AccessLogService) {
     AccessLogService.log('info', 'Logout');
     $scope.logout = function () {
-        var myEmail = localStorage.getItem('DspEmail');
         AccessLogService.log('info', 'LoggedOut');
         localStorage.clear();
         window.location = 'index.html';
-
     };
     $scope.close = function () {
         moreNavigator.popPage();

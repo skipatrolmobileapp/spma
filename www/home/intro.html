@@ -14,35 +14,47 @@
             <div class="inset hey">
                 {{message}}
             </div>
-            <div class="inset">
-                Welcome to the Ski Patrol Mobile App.
+            <div ng-show="happy">
+                <div class="inset">
+                    Welcome to the Ski Patrol Mobile App.
+                </div>
+                <div class="inset">
+                    Set up is three easy steps. First, enter your email address as it is in the patrol roster.
+                    Second, we'll send you an email with a link to generate a confirmation code.
+                    Third, enter that confirmation code here in the app. Then you're good to go.
+                </div>
+                <div class="inset">
+                    <input my-focus type="text" class="text-input" ng-model="email" placeholder="Email" style="width: 100%">
+                </div>
+                <div class="inset">
+                    Entering a fake email address will not enable you to get a confirmation code.
+                </div>
+                <div class="centered">
+                    <ons-button modifier="large tappable" ng-click="setup()">
+                        <ons-icon icon="fa-chevron-circle-right" fixed-width="true">
+                        </ons-icon>
+                        Set up
+                    </ons-button>
+                </div>
+                <div class="inset centered">
+                    By using this application, you accept the
+                    <span class="inlinelink" modifier="tappable" onclick="homeNavigator.pushPage('home/regterms.html')">
+            Terms of Service
+            </span> and
+                    <span class="inlinelink" modifier="tappable" onclick="homeNavigator.pushPage('home/regprivacy.html')">Privacy Policy</span>.
+                </div>
             </div>
-            <div class="inset">
-                Set up is three easy steps. First, enter your email address as it is in the patrol roster. 
-                Second, we'll send you an email with a link to generate a confirmation code. 
-                Third, enter the confirmation code in the app.
-                Then you're good to go.
+            <div ng-show="!happy">
+                <div class="inset" ng-show="unhappyinternet">
+                    {{unhappyinternet}}
+                </div>
+                <div class="inset" ng-show="unhappyapi">
+                    {{unhappyapi}}
+                </div>
+                <div class="inset" ng-show="unhappydatabase">
+                    {{unhappydatabase}}
+                </div>
             </div>
-            <div class="inset">
-                <input my-focus type="email" class="text-input" ng-model="email" placeholder="Email" style="width: 100%">
-            </div>
-            <div class="inset">
-                Entering a fake email address will not enable you to get a confirmation code.
-            </div>
-        </div>
-        <div class="centered">
-            <ons-button modifier="large tappable" ng-click="setup()">
-                <ons-icon icon="fa-chevron-circle-right" fixed-width="true">
-                </ons-icon>
-                Set up
-            </ons-button>
-        </div>
-        <div class="inset centered">
-            By using this application, you accept the
-            <span class="inlinelink" modifier="tappable" onclick="homeNavigator.pushPage('home/regterms.html')">
-      Terms of Service
-    </span> and
-            <span class="inlinelink" modifier="tappable" onclick="homeNavigator.pushPage('home/regprivacy.html')">Privacy Policy</span>.
         </div>
     </div>
 </ons-page>

@@ -50,6 +50,9 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
             if (!email) {
                 $rootScope.hideTabs = true;
                 homeNavigator.resetToPage('home/intro.html', {animation: 'none'});
+            } else if (email === '') {
+                $rootScope.hideTabs = true;
+                homeNavigator.resetToPage('home/intro.html', {animation: 'none'});
             } else {
                 $rootScope.hideTabs = true;
                 homeNavigator.resetToPage('home/login.html', {animation: 'none'});
@@ -117,20 +120,49 @@ module.controller('HomeController', function ($rootScope, $scope, $http, AccessL
 Let the user register with the new, simple email-based registration scheme.
 */
 module.controller('IntroController', function ($rootScope, $scope, $http, AccessLogService) {
+    var apiRequest = dspRequest('GET', '/', null),
+        databaseRequest = dspRequest('GET', '/team/_proc/Ping', null);
     AccessLogService.log('info', 'Intro');
     localStorage.removeItem('DspPatrolPrefix');
     localStorage.removeItem('DspPassword');
     $scope.email = localStorage.getItem('DspEmail');
-    // $scope.focusElement = "email";
+    $scope.focusElement = "email";
+    $scope.happy = true;
+    if(navigator.connection.type === 'none') {
+        AccessLogService.log('error', 'UnhappyInternet', niceMessage(data, status));
+        $scope.message = 'Oops! An error has occured. Please try again later.';
+        $scope.unhappyinternet = 'Internet error: Connection type = ' + navigator.connection.type;
+        $scope.happy = false;
+    }
+    $http(apiRequest).
+        success(function (data, status, headers, config) {
+            AccessLogService.log('info', 'HappyApi', niceMessage(data, status));
+        }).
+        error(function (data, status, headers, config) {
+            AccessLogService.log('error', 'UnhappyApi', niceMessage(data, status));
+            $scope.message = 'Oops! An error has occured. Please try again later.';
+            $scope.unhappyapi = 'API error: ' + niceMessage(data, status);
+            $scope.happy = false;
+        });
+    $http(databaseRequest).
+        success(function (data, status, headers, config) {
+            AccessLogService.log('info', 'HappyDatabase', niceMessage(data, status));
+        }).
+        error(function (data, status, headers, config) {
+            AccessLogService.log('error', 'UnhappyDatabase', niceMessage(data, status));
+            $scope.message = 'Oops! An error has occured. Please try again later.';
+            $scope.unhappydatabase = 'Database error: ' + niceMessage(data, status);
+            $scope.happy = false;
+        });
     $scope.setup = function () {
         var email = $scope.email,
-            getPatrollerRequest = null;
+            getPatrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null);
         $scope.message = 'Checking email...';
-        if (!$scope.email) {
+        if (!email) {
             $scope.message = 'Email address is required for set up.';
+        } else if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
+            $scope.message = 'Enter a properly formatted email address.';
         } else {
-            email = $scope.email.trim();
-            getPatrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null),
             localStorage.setItem('DspEmail', email);
             $http(getPatrollerRequest).
                 success(function (data, status, headers, config) {
@@ -198,9 +230,6 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
                     waitNoMore();
                 });
         }
-    };
-    $scope.exit = function () {
-        navigator.app.exitApp();
     };
     ons.ready(function () {
         return;
@@ -284,7 +313,9 @@ module.controller('LoginController', function ($rootScope, $scope, $http, Access
               });
     };
     $scope.register = function () {
-        homeNavigator.resetToPage('home/intro.html');
+        AccessLogService.log('info', 'StartOver');
+        localStorage.clear();
+        window.location = 'index.html';
     };
     $scope.exit = function () {
         navigator.app.exitApp();
