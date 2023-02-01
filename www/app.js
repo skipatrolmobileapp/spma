@@ -19,9 +19,12 @@ var IN_CORDOVA = false, // Indicator if in Cordova. Assume not.
     DSP_HOST = 'skipatrol.app', // Host name of the DreamFactory Service Platform (DSP) instance.
     DSP_PORT = '443', // Port of the DreamFactory Service Platform (DSP) instance.
     DSP_BASE_URL = 'https://' + DSP_HOST + ':' + DSP_PORT, // Base URL of the DreamFactory Service Platform (DSP) instance.
+    // DSP_BASE_URL = 'http://165.227.96.31/:7080',
     DSP_API_KEY = '510cb035f3ac4548fb4e75c94f40d616a67c8288faea9cd383ee219b413afdb0', // DSP 2.x app identifier.
     havingPatience = false, // Indicates whether or not the user is waiting and watching the spinner.
-    requestMap = {}; // A map of requests for knowing when the data was last requested so that periodic cache refreshes can be done.
+    requestMap = {}, // A map of requests for knowing when the data was last requested so that periodic cache refreshes can be done.
+    redirectedToPwa = false,
+    pwaAddress = 'https://skipatrol.app/wpvsp/www/';
 
 /*
 Let iOS status bar fully appear.
@@ -468,4 +471,14 @@ function writeOutBearing(bearing) {
         retValue = 'north';
     }
     return retValue;
+}
+
+/**
+ * Redirect to PWA.
+ */
+function redirectedToPwa() {
+    if (!redirectedToPwa) {
+        browse(pwaAddress);
+        redirectedToPwa = true;
+    }
 }

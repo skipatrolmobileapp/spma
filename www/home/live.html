@@ -3,6 +3,13 @@
         <div class="inset">
             &nbsp;
         </div>
+        <ons-button modifier="large tappable" ng-show="signInAvailable" ng-click="signIn()">
+            <ons-icon icon="fa-plus" fixed-width="true">
+            </ons-icon>
+            Sign-In
+        </ons-button>
+        <div class="inset" ng-show="signInAvailable">
+        </div>
         <ons-list>
             <ons-list-header ng-show="liveCams || travelCams">
                 Travel / Conditions

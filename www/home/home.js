@@ -8,7 +8,7 @@
 
 /*
 Ski Patrol Mobile App
-Copyright © 2014-2022, Gary Meyer.
+Copyright © 2014-2023, Gary Meyer.
 All rights reserved.
 */
 
@@ -128,12 +128,70 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
     $scope.email = localStorage.getItem('DspEmail');
     $scope.focusElement = "email";
     $scope.happy = true;
-    if(navigator.connection.type === 'none') {
-        AccessLogService.log('error', 'UnhappyInternet', niceMessage(data, status));
+    if(navigator && navigator.connection && navigator.connection.type && navigator.connection.type === 'none') {
         $scope.message = 'Oops! An error has occured. Please try again later.';
-        $scope.unhappyinternet = 'Internet error: Connection type = ' + navigator.connection.type;
+        $scope.unhappyconnection = 'Connection error: Connection type = ' + navigator.connection.type;
         $scope.happy = false;
+        redirectToPwa();
     }
+
+    // https://skipatrol.app/api/v2/
+    // https://skipatrol.app/api/v2/team/_proc/Ping?api_key=510cb035f3ac4548fb4e75c94f40d616a67c8288faea9cd383ee219b413afdb0
+    // https://public.freeproxyapi.com/api/Proxy/Mini
+    // https://sandbox.api.service.nhs.uk/hello-world/hello/world
+    // https://skipatrol.app/wpvsp/www/test.json
+    /*
+    console.debug('Connection diagnostics.')
+    $http({
+        method: 'GET',
+        url: 'https://skipatrol.app/api/v2/'
+    }).
+        success(function (data, status, headers, config) {
+            console.debug('Success.');
+            $scope.message = 'WORKED!';
+            $scope.unhappyinternet = JSON.stringify(data);
+            $scope.happy = false;
+        }).
+        error(function (data, status, headers, config) {
+            console.debug('Error.');
+            $scope.message = 'FAILED!';
+            $scope.unhappyinternet = status + JSON.stringify(headers);
+            $scope.happy = false;
+        });
+    */
+
+    /**
+     * Testing connectivity.
+     */
+    $http({
+        method: 'GET',
+        url: 'https://dns.google/resolve?name=skipatrol.app'
+    }).
+        success(function (data, status, headers, config) {
+            var siteName;
+            if (data && data.Answer && data.Answer[0] && data.Answer[0].data) {
+                siteName = data.Answer[0].name;
+                if ('skipatrol.app.' === siteName) {
+                    AccessLogService.log('info', 'HappyDns', niceMessage(data, status));
+                } else {
+                    AccessLogService.log('error', 'UnhappyDns', niceMessage(data, status));
+                    $scope.message = 'Oops! An error has occured. Please try again later.';
+                    $scope.unhappyinternet = 'DNS error: API server can not be found. ' + status + JSON.stringify(data);
+                    $scope.happy = false;
+                }
+            } else {
+                AccessLogService.log('error', 'UnhappyDnsResolution', niceMessage(data, status));
+                $scope.message = 'Oops! An error has occured. Please try again later.';
+                $scope.unhappyinternet = 'DNS resolution error: API server can not be found. ' + status + JSON.stringify(data);
+                $scope.happy = false;
+            }
+        }).
+        error(function (data, status, headers, config) {
+            AccessLogService.log('error', 'UnhappyInternet', niceMessage(data, status));
+            $scope.message = 'Oops! An error has occured. Please try again later.';
+            $scope.unhappyinternet = 'Internet error: Internet can not be accessed by this app.';
+            $scope.happy = false;
+        });
     $http(apiRequest).
         success(function (data, status, headers, config) {
             AccessLogService.log('info', 'HappyApi', niceMessage(data, status));
@@ -141,7 +199,7 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
         error(function (data, status, headers, config) {
             AccessLogService.log('error', 'UnhappyApi', niceMessage(data, status));
             $scope.message = 'Oops! An error has occured. Please try again later.';
-            $scope.unhappyapi = 'API error: ' + niceMessage(data, status);
+            $scope.unhappyapi = 'API error: API server can not be accessed.';
             $scope.happy = false;
         });
     $http(databaseRequest).
@@ -151,9 +209,10 @@ module.controller('IntroController', function ($rootScope, $scope, $http, Access
         error(function (data, status, headers, config) {
             AccessLogService.log('error', 'UnhappyDatabase', niceMessage(data, status));
             $scope.message = 'Oops! An error has occured. Please try again later.';
-            $scope.unhappydatabase = 'Database error: ' + niceMessage(data, status);
+            $scope.unhappydatabase = 'Database error: Database can not be accessed.';
             $scope.happy = false;
         });
+
     $scope.setup = function () {
         var email = $scope.email,
             getPatrollerRequest = dspRequest('GET', '/team/_proc/GetPatroller(' + email + ')', null);
@@ -351,8 +410,43 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
         mountainCamCount = 0,
         travelCamCount = 0,
         email = localStorage.getItem('DspEmail'),
-        patrollerRequest = dspRequest('GET',  '/team/_proc/GetPatroller(' + email + ')', null);
+        patrollerRequest = dspRequest('GET',  '/team/_proc/GetPatroller(' + email + ')', null),
+        rightNow = new Date('2023-01-08'),
+        signInTodayRequest = dspRequest('GET',  '/team/_proc/WpSignInToday(' + moment(rightNow).format('YYYY-MM-DD') + ')', null),
+        signInOpenRequest = dspRequest('GET',  '/team/_proc/WpSignInOpen(' + moment(rightNow).format('HH') + ',' + moment(rightNow).format('MM') + ')', null);
     AccessLogService.log('info', 'Live');
+    $scope.signInAvailable = false;
+    if (patrolPrefix === 'WinterPark') {
+        console.debug('Let us see about sign in.');
+        $http(signInTodayRequest).
+            success(function (data, status, headers, config) {
+                console.debug('Is today a credit day?');
+                if (data && data[0] && data[0].signInOpen) {
+                    console.debug('Yes, today is a credit day.');
+                    console.debug('Is it time to sign in?');
+                    $http(signInOpenRequest).
+                        success(function (data, status, headers, config) {
+                            console.debug(JSON.stringify(data));
+                            if (data && data[0] && data[0].signInOpen && data[0].signInOpen === 1) {
+                                console.debug(JSON.stringify(data[0].signInOpen));
+                                console.debug('Yes, it is time to sign in.');
+                                $scope.signInAvailable = true;
+                            } else {
+                                console.debug('No, it is not time to sign in.');
+                                $scope.signInAvailable = false;
+                            }
+                        }).
+                        error(function (data, status, headers, config) {
+                            AccessLogService.log('error', 'GetSignInOpenErr', niceMessage(data, status));
+                        });
+                } else {
+                    console.debug('No, today is not a credit day.');
+                }
+            }).
+            error(function (data, status, headers, config) {
+                AccessLogService.log('error', 'GetSignInTodayErr', niceMessage(data, status));
+            });
+    }
     $scope.role = role;
     $http(territoryRequest).
         success(function (data, status, headers, config) {
@@ -523,8 +617,9 @@ module.controller('LiveController', function ($scope, $http, AccessLogService) {
             error(function (data, status, headers, config) {
                 AccessLogService.log('error', 'GetEventErr', niceMessage(data, status));
             });
-
-
+    $scope.signIn = function() {
+        console.debug('Sign in clicked.');
+    }
     $scope.viewCategory = function (index) {
         localStorage.setItem('OnsCategory', categories[index].category);
         homeNavigator.pushPage('home/contentcategory.html');

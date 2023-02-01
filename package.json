@@ -8,7 +8,8 @@
             "cordova-plugin-device": {},
             "cordova-plugin-inappbrowser": {},
             "cordova-plugin-statusbar": {},
-            "cordova-plugin-network-information": {}
+            "cordova-plugin-network-information": {},
+            "cordova-plugin-geolocation": {}
         }
     },
     "dependencies": {
@@ -18,7 +19,8 @@
         "cordova-plugin-device": "2.1.0",
         "cordova-plugin-inappbrowser": "5.0.0",
         "cordova-plugin-statusbar": "2.4.3",
-        "cordova-plugin-network-information": "3.0.0"
+        "cordova-plugin-network-information": "3.0.0",
+        "cordova-plugin-geolocation": "4.1.0"
     },
     "scripts": {
         "monaca:preview": "npm run dev",

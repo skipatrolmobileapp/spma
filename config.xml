@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.skipatrolmobileapp.m" versionCode="10" version="4.1.1">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0" id="com.skipatrolmobileapp.m3" versionCode="10" version="4.1.4">
   <name>Ski Patrol</name>
   <description>Mobile App for Ski Patrollers</description>
   <author href="http://www.skipatrolmobileapp.com" email="skipatrolmobileapp@gmail.com">Gary Meyer</author>
   <content src="index.html"/>
+  <feature name="App">
+    <param name="android-package" value="org.apache.cordova.App"/>
+  </feature>
+  <feature name="LocalStorage">
+    <param name="ios-package" value="CDVLocalStorage"/>
+  </feature>
   <preference name="loglevel" value="DEBUG"/>
   <preference name="AndroidLaunchMode" value="singleTop"/>
   <preference name="ErrorUrl" value=""/>
   <preference name="SplashScreen" value="screen"/>
   <preference name="monaca:DisableCookie" value="false"/>
-  <feature name="App">
-    <param name="android-package" value="org.apache.cordova.App"/>
-  </feature>
   <preference name="AllowInlineMediaPlayback" value="false"/>
   <preference name="BackupWebStorage" value="cloud"/>
   <preference name="KeyboardDisplayRequiresUserAction" value="true"/>
@@ -22,25 +25,34 @@
   <preference name="PaginationBreakingMode" value="page"/>
   <preference name="PaginationMode" value="unpaginated"/>
   <preference name="StatusBarBackgroundColor" value="#000000"/>
-  <feature name="LocalStorage">
-    <param name="ios-package" value="CDVLocalStorage"/>
-  </feature>
-  <!--
-  <allow-navigation href="tel:*" />
-  <allow-navigation href="mailto:*" />
-  <allow-navigation href="https://api-skipatrol.rhcloud.com/*" />
-  <allow-navigation href="https://www-skipatrolapps.rhcloud.com/*" />
-  <allow-navigation href="http://res.cloudinary.com/*" />
-  <allow-navigation href="data:*" />
-  -->
-  <allow-navigation href="*"/>
-  <allow-intent href="*"/>
   <preference name="monaca:targetFamilyiPhone" value="1"/>
   <preference name="monaca:targetFamilyiPad" value="1"/>
-  <allow-intent href="itms:*"/>
-  <allow-intent href="itms-apps:*"/>
-  <allow-navigation href="*"/>
   <preference name="FadeSplashScreenDuration" value="250"/>
+  <preference name="MediaTypesRequiringUserActionForPlayback" value="none"/>
+  <preference name="ios-XCBuildConfiguration-TARGETED_DEVICE_FAMILY" value="1,2"/>
+  <preference name="KeepRunning" value="true"/>
+  <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
+  <preference name="Orientation" value="default"/>
+  <preference name="SplashScreenDelay" value="2000"/>
+  <preference name="Fullscreen" value="false"/>
+  <preference name="target-device" value="universal"/>
+  <preference name="AutoHideSplashScreen" value="true"/>
+  <preference name="FadeSplashScreen" value="true"/>
+  <preference name="ShowSplashScreenSpinner" value="false"/>
+  <preference name="DisallowOverscroll" value="true"/>
+  <preference name="EnableViewportScale" value="true"/>
+  <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need camera access to take pictures</string>
+  </edit-config>
+  <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need to photo library access to get pictures from there</string>
+  </edit-config>
+  <edit-config target="NSLocationWhenInUseUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need location access to find things nearby</string>
+  </edit-config>
+  <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need to photo library access to save pictures there</string>
+  </edit-config>
   <platform name="ios">
     <icon src="/res/ios/icon/icon-83.5@2x~ipad.png" width="167" height="167"/>
     <icon src="/res/ios/icon/icon.png" width="57" height="57"/>
@@ -72,21 +84,9 @@
     <icon src="/res/android/icon/xhdpi.png" density="xhdpi"/>
     <icon src="/res/android/icon/xxhdpi.png" density="xxhdpi"/>
     <icon src="/res/android/icon/xxxhdpi.png" density="xxxhdpi"/>
-    <preference name="AndroidWindowSplashScreenBackground" value="#468fff"/>
+    <preference name="AndroidWindowSplashScreenBackground" value="#000000"/>
     <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/android/screen/window_splashscreen_icon.png"/>
   </platform>
-  <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
-    <string>need camera access to take pictures</string>
-  </edit-config>
-  <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
-    <string>need to photo library access to get pictures from there</string>
-  </edit-config>
-  <edit-config target="NSLocationWhenInUseUsageDescription" file="*-Info.plist" mode="merge">
-    <string>need location access to find things nearby</string>
-  </edit-config>
-  <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
-    <string>need to photo library access to save pictures there</string>
-  </edit-config>
   <platform name="electron">
     <icon src="/res/electron/icon/icon_electron_512.png" width="512" height="512"/>
     <preference name="SplashScreenWidth" value="620"/>
@@ -94,20 +94,15 @@
     <preference name="ShowSplashScreen" value="false"/>
     <splash src="/res/electron/screen/electron_splash_image.png" width="620" height="300"/>
   </platform>
-  <preference name="MediaTypesRequiringUserActionForPlayback" value="none"/>
-  <preference name="ios-XCBuildConfiguration-TARGETED_DEVICE_FAMILY" value="1,2"/>
-  <preference name="KeepRunning" value="true"/>
-  <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
-  <preference name="Orientation" value="default"/>
-  <preference name="SplashScreenDelay" value="2000"/>
-  <preference name="Fullscreen" value="false"/>
-  <preference name="target-device" value="universal"/>
-  <preference name="AutoHideSplashScreen" value="true"/>
-  <preference name="FadeSplashScreen" value="true"/>
-  <preference name="ShowSplashScreenSpinner" value="false"/>
   <access origin="*"/>
-  <preference name="DisallowOverscroll" value="true"/>
-  <preference name="EnableViewportScale" value="true"/>
+  <allow-intent href="*"/>
+  <allow-intent href="tel:*"/>
+  <allow-intent href="sms:*"/>
+  <allow-intent href="mailto:*"/>
+  <allow-intent href="geo:*"/>
+  <allow-intent href="itms:*"/>
+  <allow-intent href="itms-apps:*"/>
+  <allow-navigation href="*"/>
   <preference name="WindowsStorePublisherName" value="Ski Patrol Mobile App"/>
   <preference name="WindowsStoreIdentityName" value="ce5f0902-4904-93b4-6cbf-7391be038116"/>
 </widget>
